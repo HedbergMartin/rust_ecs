@@ -29,6 +29,7 @@ fn main() {
     match manager.get_components::<Position>() {
         Some(v) => {
             print!("Number of position components: {}\n", v.len());
+            //print!("Def: {}", v.get(0).unwrap().x);
         },
         None => print!("Error!\n"),
     }
