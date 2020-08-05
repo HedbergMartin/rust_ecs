@@ -1,7 +1,6 @@
 use crate::ecs::sparse_set::*;
 
 pub struct Family<T> {
-    pub test_id: i32,
     pub components: SparseSet<T>,
 }
 
