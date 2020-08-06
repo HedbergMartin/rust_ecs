@@ -1,16 +1,14 @@
-
-use std::cell::Cell;
 type SparseMap = std::collections::HashMap<usize, usize>;
 
 pub struct SparseSet<T> {
-    pub dense_array: Vec<Cell<T>>,
+    pub dense_array: Vec<T>,
     sparse_array: SparseMap,
 }
 
 impl<T> SparseSet<T> {
     pub fn new() -> Self {
         SparseSet {
-            dense_array: Vec::<Cell<T>>::new(),
+            dense_array: Vec::<T>::new(),
             sparse_array: SparseMap::new(),
         }
     }
@@ -18,10 +16,10 @@ impl<T> SparseSet<T> {
     pub fn add(&mut self, index: &usize, value: T) {
         //TODO check for existing value at index
         self.sparse_array.insert(*index, self.dense_array.len());
-        self.dense_array.push(Cell::new(value));
+        self.dense_array.push(value);
     }
 
-    pub fn get(&self, index: &usize) -> Option<T>
+    /*pub fn get(&self, index: &usize) -> Option<T>
     where T: std::marker::Copy {
         match self.sparse_array.get(index) {
             Some(i) => Some(self.dense_array.get(*i).unwrap().get()), //TODO maybe inefficent?
@@ -35,7 +33,7 @@ impl<T> SparseSet<T> {
             Some(c) => Some(c.get()), //TODO maybe inefficent?
             None => None,
         }
-    }
+    }*/
 
     /*pub fn get_mut(&mut self, index: &usize) -> Option<&mut T> {
         match self.sparse_array.get(index) {

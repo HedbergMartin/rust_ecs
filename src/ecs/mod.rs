@@ -1,48 +1,25 @@
 //mod sparse_set;
 
-mod family_manager;
-mod sparse_set;
-pub use family_manager::*;
+pub mod sparse_set;
+mod component_manager;
 
 pub type Entity = usize;
 
 pub struct Manager {
     entities: Vec<i32>,
-    container: family_manager::Container,
+    pub component_manager: component_manager::ComponentManager,
 }
 
 impl Manager {
     pub fn new() -> Self {
         Manager {
             entities: Vec::new(),
-            container: family_manager::Container::new(),
+            component_manager: component_manager::ComponentManager::new(),
         }
     }
 
-    pub fn add_component<T: std::any::Any >(&mut self, entity: &Entity, component: T) {
-        //print!("Adding comp... ");
-        //let a = self.entities.len();
-        match self.container.get_mut::<T>() {
-            Some(family) => {
-                //print!("Found family and adding!\n");
-                family.components.add(entity, component);
-            },
-            None => {
-                //print!("Creating family... ");
-                self.container.add(family_manager::Family {components: sparse_set::SparseSet::<T>::new()});
-                self.add_component::<T>(entity, component);
-                return;
-            },
-        }
-    }
+    
 
-    pub fn get_components<T: std::any::Any>(&self) -> Option<& sparse_set::SparseSet<T>> {
-        //print!("Getting components of type {}!\n", std::any::type_name::<T>());
-        match self.container.get::<T>() {
-            Some(family) =>  Some(&family.components),
-            None => None,
-        }
-    }
 
     /*pub fn get_components_mut<T: std::any::Any>(&mut self) -> Option<&mut sparse_set::SparseSet<T>> {
         print!("Getting components of type {}!\n", std::any::type_name::<T>());
@@ -73,14 +50,6 @@ impl Manager {
         }
     }*/
 
-    pub fn get_component<T: std::any::Any>(&self, entity: &Entity) -> Option<T> 
-    where T: std::marker::Copy {
-        //print!("Getting component of type {} for entity with ID {}!\n", std::any::type_name::<T>(), entity);
-        match self.container.get::<T>() {
-            Some(family) =>  family.components.get(entity),
-            None => None,
-        }
-    }
 
     /*pub fn get_component_len<T: std::any::Any>(&self) -> usize {
         match self.container.get::<T>() {

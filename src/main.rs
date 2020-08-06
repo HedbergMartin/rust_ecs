@@ -1,5 +1,6 @@
 mod ecs;
 
+
 #[allow(dead_code)]
 #[derive(Debug, Clone, Copy)]
 pub struct Position {
@@ -14,19 +15,15 @@ pub struct HP {
     hp: i32,
 }
 
-#[derive(Debug)]
-struct noCopy {
-    x: i32,
-}
-
 fn main() {
     //let vec = Vec::<Comp>::new();
+    // Todo get rid of mut
     let mut manager = ecs::Manager::new();
 
     for i in 0..100000 {
         let e = i;
-        manager.add_component(&e, Position {x: i as i32, y:2, z: 2});
-        manager.add_component(&e, HP {hp: 10});
+        manager.component_manager.add_component(&e, Position {x: i as i32, y:2, z: 2});
+        manager.component_manager.add_component(&e, HP {hp: 10});
 
     }
     
@@ -38,13 +35,13 @@ fn main() {
     //print!("Number of position components: {}\n", positions.len());
 
     let now = std::time::Instant::now();
-    match manager.get_components::<Position>() {
+    match manager.component_manager.get_components_mut::<Position>() {
         Some(position) => {
-            match manager.get_components::<HP>() {
+            match manager.component_manager.get_components::<HP>() {
                 Some(hps) => {
                     for (index, pos) in position.dense_array.iter().enumerate() {
-                        match hps.get_dense_index(&index) {
-                            Some(hp) => pos.set(Position {x: hp.hp + 100, ..pos.get()}),
+                        match hps.dense_array.get(index) {
+                            Some(hp) => {},
                             None => {},
                         }
                         

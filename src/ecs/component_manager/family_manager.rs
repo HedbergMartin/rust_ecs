@@ -1,7 +1,14 @@
 use crate::ecs::sparse_set::*;
+use std::cell::RefCell;
 
 pub struct Family<T> {
-    pub components: SparseSet<T>,
+    pub components: RefCell<SparseSet<T>>,
+}
+
+impl<T> Family<T> {
+    pub fn new() -> Self {
+        Family{ components: RefCell::new(SparseSet::new()), }
+    }
 }
 
 pub struct Container {
@@ -9,7 +16,7 @@ pub struct Container {
 }
 
 impl Container {
-    pub fn new() -> Container {
+    pub fn new() -> Self {
         Container { families: std::collections::HashMap::new() }
     }
 
