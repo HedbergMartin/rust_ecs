@@ -1,3 +1,4 @@
+#[macro_use]
 mod ecs;
 
 
@@ -15,15 +16,16 @@ pub struct HP {
     hp: i32,
 }
 
+
 fn main() {
     //let vec = Vec::<Comp>::new();
     // Todo get rid of mut
-    let mut manager = ecs::Manager::new();
+    let manager = ecs::Manager::new();
 
     for i in 0..100000 {
         let e = i;
-        manager.component_manager.add_component(&e, Position {x: i as i32, y:2, z: 2});
-        manager.component_manager.add_component(&e, HP {hp: 10});
+        manager.add_component(&e, Position {x: i as i32, y:2, z: 2});
+        manager.add_component(&e, HP {hp: 10});
 
     }
     
@@ -33,28 +35,45 @@ fn main() {
     //print!("Size {}", hps.len() * std::mem::size_of::<HP>());
     
     //print!("Number of position components: {}\n", positions.len());
+    //impl_SystemTrait!(Position);
+    //manager.run(|a: &ecs::sparse_set::SparseSet<Position>| {
 
-    let now = std::time::Instant::now();
-    match manager.component_manager.get_components_mut::<Position>() {
-        Some(position) => {
-            match manager.component_manager.get_components::<HP>() {
-                Some(hps) => {
-                    for (index, pos) in position.dense_array.iter().enumerate() {
-                        match hps.dense_array.get(index) {
-                            Some(hp) => {},
-                            None => {},
-                        }
-                        
-                        //let hp = manager.get_component_copy::<HP>(&index);//hps.dense_array.get(index).unwrap();
-                        //pos.y += hp.hp;
+    manager.run(|comp_manager: ecs::ComponentView| {
+        for t in 1..10 {
+            let now = std::time::Instant::now();
+            match comp_manager.get_components_mut::<Position>() {
+                Some(mut position) => {
+                    match comp_manager.get_components::<HP>() {
+                        Some(hps) => {
+                            for (index, pos) in position.dense_array.iter_mut().enumerate() {
+                                match hps.dense_array.get(index) {
+                                    Some(hp) => {
+                                        pos.x = pos.x + hp.hp;
+                                    },
+                                    None => {},
+                                }
+                                
+                                //let hp = manager.get_component_copy::<HP>(&index);//hps.dense_array.get(index).unwrap();
+                                //pos.y += hp.hp;
+                            }
+                        },
+                        None => print!("Inner error"),
+                    }
+                },
+                None => print!("Error!\n"),
+            }
+            println!("{}\n", now.elapsed().as_nanos());
+
+            match comp_manager.get_components::<Position>() {
+                Some(p) => {
+                    for (i, pos) in p.dense_array.iter().enumerate() {
+                        assert_eq!(pos.x as usize, i + t*10);
                     }
                 },
                 None => {},
-            }
-        },
-        None => print!("Error!\n"),
-    }
-    println!("First took {} ns\n", now.elapsed().as_nanos());
+            };
+        }
+    });
     
     /*let now = std::time::Instant::now();
     for index in 0..manager.get_component_len::<Position>() {

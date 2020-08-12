@@ -20,13 +20,13 @@ impl Container {
         Container { families: std::collections::HashMap::new() }
     }
 
-    pub fn add<T: std::any::Any>(&mut self, family: Family<T>)
+    pub fn add_family<T: std::any::Any>(&mut self, family: Family<T>)
     where T: std::any::Any, {
         //print!("Added type of {:?}\n", std::any::TypeId::of::<T>());
         self.families.insert(std::any::TypeId::of::<T>(), Box::new(family));
     }
 
-    pub fn get<T: std::any::Any>(& self) -> Option<& Family<T>> {
+    pub fn get_family<T: std::any::Any>(& self) -> Option<& Family<T>> {
         //if let Some(b) = self.families.iter().find(|b| b.downcast_ref::<T>().map(|x| x.name()) == Some(name)) {
         //print!("Get type of {:?}\n", std::any::TypeId::of::<T>());
         if let Some(b) = self.families.get(&(std::any::TypeId::of::<T>())) {
@@ -35,7 +35,7 @@ impl Container {
         None
     }
 
-    pub fn get_mut<T: std::any::Any>(&mut self) -> Option<&mut Family<T>> {
+    pub fn get_family_mut<T: std::any::Any>(&mut self) -> Option<&mut Family<T>> {
         //if let Some(b) = self.families.iter().find(|b| b.downcast_ref::<T>().map(|x| x.name()) == Some(name)) {
         //print!("Get type of {:?}\n", std::any::TypeId::of::<T>());
         match self.families.get_mut(&(std::any::TypeId::of::<T>())) {
