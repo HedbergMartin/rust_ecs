@@ -1,9 +1,8 @@
 //mod sparse_set;
 
 pub mod sparse_set;
+pub mod systems;
 mod cm;
-#[macro_use]
-pub mod system;
 
 pub type Entity = usize;
 
@@ -13,6 +12,7 @@ use std::cell::RefCell;
 
 pub struct Manager {
     entities: Vec<i32>,
+    schedule: RefCell<Vec<Box<dyn Fn(ComponentView)>>>,
     comp_manager: RefCell<cm::ComponentManager>,
 }
 
@@ -22,6 +22,7 @@ impl Manager {
     pub fn new() -> Self {
         Manager {
             entities: Vec::new(),
+            schedule: RefCell::new(Vec::new()),
             comp_manager: RefCell::new(cm::ComponentManager::new()),
         }
     }
@@ -38,8 +39,11 @@ impl Manager {
         self.comp_manager.borrow_mut()
     }
 
-    pub fn run<F>(&self, func: F)
-    where F: FnOnce(ComponentView) {
-        func(self.get_comp_manager());
+    pub fn schedule<F: 'static + Fn(ComponentView)>(&self, func: F) {
+        self.schedule.borrow_mut().push(Box::new(func));
+    }
+
+    pub fn run(&self, index: usize) {
+        (self.schedule.borrow().get(index).unwrap())(self.comp_manager.borrow());
     }
 }

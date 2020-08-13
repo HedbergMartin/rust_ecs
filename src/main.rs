@@ -1,17 +1,12 @@
 #[macro_use]
 mod ecs;
 
-
-#[allow(dead_code)]
-#[derive(Debug, Clone, Copy)]
 pub struct Position {
     x: i32,
     y: i32,
     z: i32,
 }
 
-#[allow(dead_code)]
-#[derive(Debug, Clone, Copy)]
 pub struct HP {
     hp: i32,
 }
@@ -38,7 +33,7 @@ fn main() {
     //impl_SystemTrait!(Position);
     //manager.run(|a: &ecs::sparse_set::SparseSet<Position>| {
 
-    manager.run(|comp_manager: ecs::ComponentView| {
+    manager.schedule(|comp_manager: ecs::ComponentView| {
         for t in 1..10 {
             let now = std::time::Instant::now();
             match comp_manager.get_components_mut::<Position>() {
@@ -74,6 +69,11 @@ fn main() {
             };
         }
     });
+
+    print!("Wait!\n");
+    std::thread::sleep(std::time::Duration::from_secs(3));
+
+    manager.run(0);
     
     /*let now = std::time::Instant::now();
     for index in 0..manager.get_component_len::<Position>() {
