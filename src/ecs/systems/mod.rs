@@ -1,22 +1,21 @@
 
 use crate::ecs::ComponentView;
 
-pub struct System<RunFunc>
-where RunFunc : Fn(ComponentView) {
-    func: RunFunc,
-    //Todo ref to manager    
+//Not stable yet
+//pub trait func_type = 'static + Fn(ComponentView);
+
+pub struct System {
+    func_ptr: Box<dyn Fn(ComponentView)>  
 }
 
-impl<RunFunc> System<RunFunc> 
-where RunFunc: Fn(ComponentView) {
-    pub fn new(func: RunFunc) -> Self {
+impl System {
+    pub fn new<F: 'static + Fn(ComponentView)>(func: F) -> Self {
         Self {
-            func,
+            func_ptr: Box::new(func),
         }
     }
-
     pub fn run(&self, cm_ref: ComponentView) {
-        (self.func)(cm_ref);
+        (self.func_ptr)(cm_ref);
     }
 }
 

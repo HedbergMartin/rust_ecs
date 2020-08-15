@@ -1,3 +1,7 @@
+
+//EXPERIMENTAL: trait aliases
+//#![feature(trait_alias)]
+
 #[macro_use]
 mod ecs;
 
@@ -33,7 +37,7 @@ fn main() {
     //impl_SystemTrait!(Position);
     //manager.run(|a: &ecs::sparse_set::SparseSet<Position>| {
 
-    manager.schedule(|comp_manager: ecs::ComponentView| {
+    manager.register_task(|comp_manager: ecs::ComponentView| {
         for t in 1..10 {
             let now = std::time::Instant::now();
             match comp_manager.get_components_mut::<Position>() {
@@ -70,10 +74,19 @@ fn main() {
         }
     });
 
+    manager.register_task(|comp_manager: ecs::ComponentView| {
+        print!("Numerurehro\n");
+    });
+
     print!("Wait!\n");
     std::thread::sleep(std::time::Duration::from_secs(3));
 
-    manager.run(0);
+    manager.run_task(1);
+    std::thread::sleep(std::time::Duration::from_secs(3));
+
+    manager.run_task(2);
+    std::thread::sleep(std::time::Duration::from_secs(3));
+    manager.run_task(0);
     
     /*let now = std::time::Instant::now();
     for index in 0..manager.get_component_len::<Position>() {

@@ -12,7 +12,7 @@ use std::cell::RefCell;
 
 pub struct Manager {
     entities: Vec<i32>,
-    schedule: RefCell<Vec<Box<dyn Fn(ComponentView)>>>,
+    schedule: RefCell<Vec<systems::System>>,
     comp_manager: RefCell<cm::ComponentManager>,
 }
 
@@ -39,11 +39,14 @@ impl Manager {
         self.comp_manager.borrow_mut()
     }
 
-    pub fn schedule<F: 'static + Fn(ComponentView)>(&self, func: F) {
-        self.schedule.borrow_mut().push(Box::new(func));
+    pub fn register_task<F: 'static + Fn(ComponentView)>(&self, func: F) {
+        self.schedule.borrow_mut().push(systems::System::new(func));
     }
 
-    pub fn run(&self, index: usize) {
-        (self.schedule.borrow().get(index).unwrap())(self.comp_manager.borrow());
+    pub fn run_task(&self, index: usize) {
+        match self.schedule.borrow().get(index) {
+            Some(task) => task.run(self.comp_manager.borrow()),
+            None => print!("No task found with ID {}\n", index),
+        }
     }
 }
