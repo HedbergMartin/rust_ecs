@@ -22,7 +22,7 @@ fn main() {
     let manager = ecs::Manager::new();
 
     for i in 0..100000 {
-        let e = i;
+        let e = manager.add_entity();
         manager.add_component(&e, Position {x: i as i32, y:2, z: 2});
         manager.add_component(&e, HP {hp: 10});
 
@@ -37,7 +37,7 @@ fn main() {
     //impl_SystemTrait!(Position);
     //manager.run(|a: &ecs::sparse_set::SparseSet<Position>| {
 
-    manager.register_task(|comp_manager: ecs::ComponentView| {
+    manager.register_task("Render", |comp_manager: ecs::ComponentView| {
         for t in 1..10 {
             let now = std::time::Instant::now();
             match comp_manager.get_components_mut::<Position>() {
@@ -74,19 +74,19 @@ fn main() {
         }
     });
 
-    manager.register_task(|comp_manager: ecs::ComponentView| {
+    manager.register_task("Prnt",|comp_manager: ecs::ComponentView| {
         print!("Numerurehro\n");
     });
 
     print!("Wait!\n");
-    std::thread::sleep(std::time::Duration::from_secs(3));
+    //std::thread::sleep(std::time::Duration::from_secs(3));
 
-    manager.run_task(1);
-    std::thread::sleep(std::time::Duration::from_secs(3));
+    manager.run_task("Prnt");
+    //std::thread::sleep(std::time::Duration::from_secs(3));
 
-    manager.run_task(2);
-    std::thread::sleep(std::time::Duration::from_secs(3));
-    manager.run_task(0);
+    manager.run_task("Nope");
+    //std::thread::sleep(std::time::Duration::from_secs(3));
+    manager.run_task("Render");
     
     /*let now = std::time::Instant::now();
     for index in 0..manager.get_component_len::<Position>() {
