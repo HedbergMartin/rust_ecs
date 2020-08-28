@@ -1,10 +1,12 @@
 //mod sparse_set;
 
 pub mod sparse_set;
-pub mod systems;
-mod cm;
+use sparse_set::Entity;
 
-pub type Entity = usize;
+#[macro_use]
+pub mod systems;
+pub mod cm;
+
 
 use std::cell::Ref;
 use std::cell::RefMut;
@@ -38,11 +40,11 @@ impl Manager {
         return e;
     }
 
-    pub fn add_component<T: std::any::Any >(&self, entity: &Entity, component: T) {
+    pub fn add_component<T: cm::Group >(&self, entity: &Entity, component: T) {
         self.comp_manager.borrow_mut().add_component(entity, component);
     }
 
-    pub fn get_comp_manager(&self) -> Ref<'_, cm::ComponentManager> {
+    fn get_comp_manager(&self) -> Ref<'_, cm::ComponentManager> {
         self.comp_manager.borrow()
     }
 
@@ -50,7 +52,7 @@ impl Manager {
         self.comp_manager.borrow_mut()
     }
 
-    pub fn register_task<'name, F: 'static + Fn(ComponentView)>(&self, name: &str, func: F) {
+    pub fn register_task<F: 'static + Fn(ComponentView)>(&self, name: &str, func: F) {
         self.schedule.borrow_mut().insert(String::from(name), systems::System::new(name, func));
     }
 
@@ -59,6 +61,13 @@ impl Manager {
         match self.schedule.borrow().get(&n) {
             Some(task) => task.run(self.comp_manager.borrow()),
             None => print!("No task found with ID {}\n", name),
+        }
+    }
+
+    pub fn print_components<T: 'static>(&self) {
+        match self.get_comp_manager().get_components::<T>() {
+            Some(comp) => comp.print(),
+            None => print!("No comp of type {:?} found", std::any::type_name::<T>()),
         }
     }
 }
