@@ -17,16 +17,12 @@ impl ComponentManager {
     }
 
     pub fn add_component<T: Groupable >(&mut self, entity: Entity, component: T) {
-        //print!("Adding comp... ");
-        //TODO Redo with add inside of family manager?
         match self.family_container.get_family_mut::<T>() {
             Some(family) => {
-                //print!("Found family and adding!\n");
                 family.components.borrow_mut().add(entity, component);
                 T::sort(&self, &entity);
             },
             None => {
-                //print!("Creating family... ");
                 self.family_container.add_family::<T>(family_manager::Family::new());
                 self.add_component::<T>(entity, component);
                 return;
@@ -35,7 +31,6 @@ impl ComponentManager {
     }
     
     pub fn get_components<T: Groupable>(&self) -> Option<View<T>> {
-        
         match self.family_container.get_family::<T>() {
             Some(family) =>  {
                 Some(family.components.borrow())
@@ -45,7 +40,6 @@ impl ComponentManager {
     }
     
     pub fn get_components_mut<T: Groupable>(&self) -> Option<ViewMut<T>> {
-        
         match self.family_container.get_family::<T>() {
             Some(family) =>  {
                 Some(family.components.borrow_mut())
