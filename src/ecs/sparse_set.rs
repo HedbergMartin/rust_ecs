@@ -20,11 +20,11 @@ impl<T> SparseSet<T> {
     }
 
     //TODO should entity be ref?
-    pub fn add(&mut self, entity: &Entity, value: T) {
+    pub fn add(&mut self, entity: Entity, value: T) {
         //TODO check for existing value at index
-        self.sparse_array.insert(*entity, self.comp_array.len());
+        self.sparse_array.insert(entity, self.comp_array.len());
         self.comp_array.push(value);
-        self.entity_array.push(*entity);
+        self.entity_array.push(entity);
     }
 
     pub fn get(&self, entity: &Entity) -> Option<&T> {

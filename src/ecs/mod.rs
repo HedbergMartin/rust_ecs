@@ -43,7 +43,7 @@ impl Manager {
         return e;
     }
 
-    pub fn add_component<T: Group >(&self, entity: &Entity, component: T) {
+    pub fn add_component<T: Group >(&self, entity: Entity, component: T) {
         self.comp_manager.borrow_mut().add_component(entity, component);
     }
 

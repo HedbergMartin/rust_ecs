@@ -16,14 +16,14 @@ impl ComponentManager {
         ComponentManager { family_container: family_manager::Container::new() }
     }
 
-    pub fn add_component<T: Group >(&mut self, entity: &Entity, component: T) {
+    pub fn add_component<T: Group >(&mut self, entity: Entity, component: T) {
         //print!("Adding comp... ");
         //TODO Redo with add inside of family manager?
         match self.family_container.get_family_mut::<T>() {
             Some(family) => {
                 //print!("Found family and adding!\n");
                 family.components.borrow_mut().add(entity, component);
-                T::sort(&self, entity);
+                T::sort(&self, &entity);
             },
             None => {
                 //print!("Creating family... ");

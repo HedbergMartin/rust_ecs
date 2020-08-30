@@ -28,8 +28,8 @@ fn main() {
     // -------------
         
     let e1 = manager.add_entity();
-    manager.add_component(&e1, Position {x: 2 as i32, y:2, z: 2});
-    manager.add_component(&e1, HP {hp: 10});
+    manager.add_component(e1, Position {x: 2 as i32, y:2, z: 2});
+    manager.add_component(e1, HP {hp: 10});
 
     print!("Positions: \n");
     manager.print_components::<Position>();
@@ -41,7 +41,7 @@ fn main() {
     // -------------
         
     let e2 = manager.add_entity();
-    manager.add_component(&e2, Position {x: 2 as i32, y:2, z: 2});
+    manager.add_component(e2, Position {x: 2 as i32, y:2, z: 2});
 
     print!("Positions: \n");
     manager.print_components::<Position>();
@@ -53,7 +53,7 @@ fn main() {
     // -------------
         
     let e3 = manager.add_entity();
-    manager.add_component(&e3, HP {hp: 10});
+    manager.add_component(e3, HP {hp: 10});
 
     print!("Positions: \n");
     manager.print_components::<Position>();
@@ -64,7 +64,7 @@ fn main() {
 
     // -------------
         
-    manager.add_component(&e2, HP {hp: 10});
+    manager.add_component(e2, HP {hp: 10});
 
     print!("Positions: \n");
     manager.print_components::<Position>();
