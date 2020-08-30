@@ -78,3 +78,14 @@ impl Manager {
 pub trait Groupable: 'static {
     fn sort(cm: &cm::ComponentManager, entity: &Entity);
 }
+
+#[macro_export]
+macro_rules! entity {
+    ($m:expr, $($comp:expr),*) => {{
+        let e = crate::ecs::Manager::add_entity($m);
+        $(
+            crate::ecs::Manager::add_component($m, e, $comp);
+        )*
+        e
+    }};
+}

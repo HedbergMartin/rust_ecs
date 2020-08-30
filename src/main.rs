@@ -27,9 +27,7 @@ fn main() {
 
     // -------------
         
-    let e1 = manager.add_entity();
-    manager.add_component(e1, Position {x: 2 as i32, y:2, z: 2});
-    manager.add_component(e1, HP {hp: 10});
+    let e1 = entity!(&manager, Position {x: 2 as i32, y:2, z: 2}, HP {hp: 10});
 
     print!("Positions: \n");
     manager.print_components::<Position>();
