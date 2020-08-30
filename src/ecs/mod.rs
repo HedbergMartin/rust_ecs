@@ -43,7 +43,7 @@ impl Manager {
         return e;
     }
 
-    pub fn add_component<T: Group >(&self, entity: Entity, component: T) {
+    pub fn add_component<T: Groupable >(&self, entity: Entity, component: T) {
         self.comp_manager.borrow_mut().add_component(entity, component);
     }
 
@@ -67,7 +67,7 @@ impl Manager {
         }
     }
 
-    pub fn print_components<T: Group>(&self) {
+    pub fn print_components<T: Groupable>(&self) {
         match self.get_comp_manager().get_components::<T>() {
             Some(comp) => comp.print(),
             None => print!("No comp of type {:?} found", std::any::type_name::<T>()),
@@ -75,6 +75,6 @@ impl Manager {
     }
 }
 
-pub trait Group: 'static {
+pub trait Groupable: 'static {
     fn sort(cm: &cm::ComponentManager, entity: &Entity);
 }

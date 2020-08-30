@@ -2,7 +2,7 @@ mod family_manager;
 
 use crate::ecs::sparse_set;
 use crate::ecs::Entity;
-use crate::ecs::Group;
+use crate::ecs::Groupable;
 
 pub type View<'l, T> = std::cell::Ref<'l, sparse_set::SparseSet<T>>;
 pub type ViewMut<'l, T> = std::cell::RefMut<'l, sparse_set::SparseSet<T>>;
@@ -16,7 +16,7 @@ impl ComponentManager {
         ComponentManager { family_container: family_manager::Container::new() }
     }
 
-    pub fn add_component<T: Group >(&mut self, entity: Entity, component: T) {
+    pub fn add_component<T: Groupable >(&mut self, entity: Entity, component: T) {
         //print!("Adding comp... ");
         //TODO Redo with add inside of family manager?
         match self.family_container.get_family_mut::<T>() {
@@ -34,7 +34,7 @@ impl ComponentManager {
         }
     }
     
-    pub fn get_components<T: Group>(&self) -> Option<View<T>> {
+    pub fn get_components<T: Groupable>(&self) -> Option<View<T>> {
         
         match self.family_container.get_family::<T>() {
             Some(family) =>  {
@@ -44,7 +44,7 @@ impl ComponentManager {
         }
     }
     
-    pub fn get_components_mut<T: Group>(&self) -> Option<ViewMut<T>> {
+    pub fn get_components_mut<T: Groupable>(&self) -> Option<ViewMut<T>> {
         
         match self.family_container.get_family::<T>() {
             Some(family) =>  {
@@ -54,7 +54,7 @@ impl ComponentManager {
         }
     }
 
-    pub fn contains<T: Group>(&self, entity: &Entity) -> bool {
+    pub fn contains<T: Groupable>(&self, entity: &Entity) -> bool {
         match self.get_components::<T>() {
             Some(c) => c.contains(entity),
             None => false,
@@ -65,7 +65,7 @@ impl ComponentManager {
 #[macro_export]
 macro_rules! group {
     ($head:ty) => {
-        impl ecs::Group for $head {
+        impl ecs::Groupable for $head {
             fn sort(cm: &crate::ecs::cm::ComponentManager, entity: &crate::ecs::Entity) {
                 
             }
@@ -80,7 +80,7 @@ macro_rules! group {
 #[macro_export]
 macro_rules! group_raw {
     ($head:ty, $($queue:ty),+; $($done:ty),+) => {
-        impl ecs::cm::Group for $head {
+        impl ecs::Groupable for $head {
             fn sort(cm: &crate::ecs::cm::ComponentManager, entity: &crate::ecs::Entity) {
                 //TODO unwrap?
                 // print!("Sorting hps\n");
@@ -100,7 +100,7 @@ macro_rules! group_raw {
     };
 
     ($head:ty; $($done:ty),+) => {
-        impl ecs::Group for $head {
+        impl ecs::Groupable for $head {
             fn sort(cm: &crate::ecs::cm::ComponentManager, entity: &crate::ecs::Entity) {
                 //TODO unwrap?
                 // print!("Sorting hps\n");
@@ -116,7 +116,7 @@ macro_rules! group_raw {
     };
     
     ($head:ty, $($queue:ty),+; ) => {
-        impl ecs::Group for $head {
+        impl ecs::Groupable for $head {
             fn sort(cm: &crate::ecs::cm::ComponentManager, entity: &crate::ecs::Entity) {
                 //TODO unwrap?
                 // print!("Sorting hps\n");
