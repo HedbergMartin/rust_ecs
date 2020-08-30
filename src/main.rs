@@ -5,8 +5,6 @@
 #[macro_use]
 mod ecs;
 
-use crate::ecs::sparse_set::Groupable;
-
 #[derive(Debug)]
 pub struct Position {
     x: i32,
@@ -16,103 +14,6 @@ pub struct Position {
 
 pub struct HP {
     hp: i32,
-}
-
-// impl ecs::cm::Group for Position {
-//     fn sort(cm: &crate::ecs::cm::ComponentManager, entity: &crate::ecs::sparse_set::Entity) {
-//         //TODO unwrap?
-//         // Will contain pos as it is the caller.
-//         // print!("Sorting pos\n");
-//         if cm.get_components_mut::<HP>().is_some() {
-//             if cm.get_components_mut::<HP>().unwrap().contains(entity) {
-//                 cm.get_components_mut::<Position>().unwrap().swap(entity);
-//                 cm.get_components_mut::<HP>().unwrap().swap(entity);
-//             }
-//         }
-//     }
-// }
-
-// impl ecs::cm::Group for HP {
-//     fn sort(cm: &crate::ecs::cm::ComponentManager, entity: &crate::ecs::sparse_set::Entity) {
-//         //TODO unwrap?
-//         // print!("Sorting hps\n");
-//         if cm.get_components_mut::<Position>().is_some() {
-//             if cm.get_components_mut::<Position>().unwrap().contains(entity) {
-//                 cm.get_components_mut::<HP>().unwrap().swap(entity);
-//                 cm.get_components_mut::<Position>().unwrap().swap(entity);
-//             }
-//         }
-//     }
-// }
-
-macro_rules! group {
-    ($head:ty) => {
-        impl ecs::cm::Group for $head {
-            fn sort(cm: &crate::ecs::cm::ComponentManager, entity: &crate::ecs::sparse_set::Entity) {
-                
-            }
-        }
-    };
-    ($head:ty, $($tail:ty),+) => {
-        group_raw!($head, $($tail),+;);
-        //TODO make all in tail head at least once
-    };
-}
-
-macro_rules! group_raw {
-
-    ($head:ty, $($queue:ty),+; $($done:ty),+) => {
-        impl ecs::cm::Group for $head {
-            fn sort(cm: &crate::ecs::cm::ComponentManager, entity: &crate::ecs::sparse_set::Entity) {
-                //TODO unwrap?
-                // print!("Sorting hps\n");
-                //TODO not mut?
-                if $(cm.contains::<$queue>(entity))&&+ && $(cm.contains::<$done>(entity))&&+ {
-                    cm.get_components_mut::<$head>().unwrap().swap(entity);
-                    $(
-                    cm.get_components_mut::<$queue>().unwrap().swap(entity);
-                    )+
-                    $(
-                    cm.get_components_mut::<$done>().unwrap().swap(entity);
-                    )+
-                }
-            }
-        }
-        group_raw!($($queue),+; $($done),+, $head);
-    };
-
-    ($head:ty; $($done:ty),+) => {
-        impl ecs::cm::Group for $head {
-            fn sort(cm: &crate::ecs::cm::ComponentManager, entity: &crate::ecs::sparse_set::Entity) {
-                //TODO unwrap?
-                // print!("Sorting hps\n");
-                //TODO not mut?
-                if $(cm.contains::<$done>(entity))&&+ {
-                    cm.get_components_mut::<$head>().unwrap().swap(entity);
-                    $(
-                    cm.get_components_mut::<$done>().unwrap().swap(entity);
-                    )+
-                }
-            }
-        }
-    };
-    
-    ($head:ty, $($queue:ty),+; ) => {
-        impl ecs::cm::Group for $head {
-            fn sort(cm: &crate::ecs::cm::ComponentManager, entity: &crate::ecs::sparse_set::Entity) {
-                //TODO unwrap?
-                // print!("Sorting hps\n");
-                //TODO not mut?
-                if $(cm.contains::<$queue>(entity))&&+ {
-                    cm.get_components_mut::<$head>().unwrap().swap(entity);
-                    $(
-                    cm.get_components_mut::<$queue>().unwrap().swap(entity);
-                    )+
-                }
-            }
-        }
-        group_raw!($($queue),+; $head);
-    };
 }
 
 group!(Position, HP);
@@ -173,10 +74,6 @@ fn main() {
     print!("\n");
     // }
 
-    
-    let a = 2;
-    let b = Position {x: 2, y:34, z: 1 };
-
     //group!(&a);
 
     //let now = std::time::Instant::now();
@@ -187,48 +84,6 @@ fn main() {
     //print!("Number of position components: {}\n", positions.len());
     //impl_SystemTrait!(Position);
     //manager.run(|a: &ecs::sparse_set::SparseSet<Position>| {
-
-    manager.register_task("Group", |comp_manager: ecs::ComponentView| {
-        match comp_manager.get_components_mut::<Position>() {
-            Some(mut position) => {
-                match comp_manager.get_components_mut::<HP>() {
-                    Some(mut hps) => {
-                        //for every unparsed 
-
-                        // position.group(|entity: ecs::sparse_set::Entity| {
-                        //     if hps.contains(&entity) {
-                        //         hps.swap(&entity);
-                        //         return true;
-                        //     }
-                        //     return false;
-                        // });
-
-                        // hps.group(|entity: ecs::sparse_set::Entity| {
-                        //     if position.contains(&entity) {
-                        //         position.swap(&entity);
-                        //         return true;
-                        //     }
-                        //     return false;
-                        // });
-                        //Check unparsed for positions
-                            // For every found, swap position and all in group (hp)
-
-                        //Check unparsed for hp
-                            // For every found, swap hp and all in group (position)
-
-                        // position.group(|entity: ecs::sparse_set::Entity| {
-                        //     hps.contains(&entity)
-                        // });
-                        // hps.group(|entity: ecs::sparse_set::Entity| {
-                        //     position.contains(&entity)
-                        // });
-                    },
-                    None => print!("Inner error"),
-                }
-            },
-            None => print!("Error!\n"),
-        }
-    });
 
     //manager.run_task("Group");
 
@@ -269,7 +124,7 @@ fn main() {
     //     }
     // });
 
-    manager.register_task("Prnt",|comp_manager: ecs::ComponentView| {
+    manager.register_task("Prnt",|_: ecs::ComponentView| {
         print!("Numerurehro\n");
     });
 

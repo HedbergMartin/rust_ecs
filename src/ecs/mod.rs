@@ -1,12 +1,15 @@
 //mod sparse_set;
 
+
+//TODO all sub mods private?
 pub mod sparse_set;
-use sparse_set::Entity;
 
 #[macro_use]
 pub mod systems;
+
 pub mod cm;
 
+pub type Entity = usize;
 
 use std::cell::Ref;
 use std::cell::RefMut;
@@ -40,7 +43,7 @@ impl Manager {
         return e;
     }
 
-    pub fn add_component<T: cm::Group >(&self, entity: &Entity, component: T) {
+    pub fn add_component<T: Group >(&self, entity: &Entity, component: T) {
         self.comp_manager.borrow_mut().add_component(entity, component);
     }
 
@@ -64,10 +67,14 @@ impl Manager {
         }
     }
 
-    pub fn print_components<T: 'static>(&self) {
+    pub fn print_components<T: Group>(&self) {
         match self.get_comp_manager().get_components::<T>() {
             Some(comp) => comp.print(),
             None => print!("No comp of type {:?} found", std::any::type_name::<T>()),
         }
     }
+}
+
+pub trait Group: 'static {
+    fn sort(cm: &cm::ComponentManager, entity: &Entity);
 }

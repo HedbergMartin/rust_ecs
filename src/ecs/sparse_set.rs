@@ -1,21 +1,12 @@
-pub type Entity = usize;
+use crate::ecs::Entity;
 
 type SparseMap = std::collections::HashMap<Entity, usize>;
-
-pub trait Groupable {
-    fn get_group(&self) -> usize;
-    fn get_parsed(&self) -> usize;
-    fn group<F: FnMut(Entity) -> bool>(&mut self, swap_callback: F);
-    fn swap(&mut self, entity: &Entity);
-}
-
 
 pub struct SparseSet<T> {
     comp_array: Vec<T>,
     entity_array: Vec<Entity>,
     sparse_array: SparseMap,
     group: usize,
-    parsed: usize,
 }
 
 impl<T> SparseSet<T> {
@@ -25,7 +16,6 @@ impl<T> SparseSet<T> {
             entity_array: Vec::<Entity>::new(),
             sparse_array: SparseMap::new(),
             group: 0,
-            parsed: 0,
         }
     }
 
@@ -63,31 +53,8 @@ impl<T> SparseSet<T> {
         print!("\n");
         //TODO print sparse_array
     }
-}
 
-impl<T> Groupable for SparseSet<T> {
-    fn get_group(&self) -> usize {
-        self.group
-    }
-
-    fn get_parsed(&self) -> usize {
-        self.parsed
-    }
-
-    fn group<F: FnMut(Entity) -> bool>(&mut self, mut swap_callback: F) {
-
-        //TODO allready grouped?
-        while self.parsed < self.len() {
-            let current = *self.entity_array.get(self.parsed).unwrap();
-            if swap_callback(current) {
-                self.swap(&current);
-            }
-            
-            self.parsed += 1;
-        }
-    }
-
-    fn swap(&mut self, entity: &Entity) {
+    pub fn swap(&mut self, entity: &Entity) {
         match self.sparse_array.get(entity) {
             Some(_) => {
                 //Should never panic

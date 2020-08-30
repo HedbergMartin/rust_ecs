@@ -20,8 +20,7 @@ impl Container {
         Container { families: std::collections::HashMap::new() }
     }
 
-    pub fn add_family<T: std::any::Any>(&mut self, family: Family<T>)
-    where T: std::any::Any, {
+    pub fn add_family<T: std::any::Any>(&mut self, family: Family<T>) {
         //print!("Added type of {:?}\n", std::any::TypeId::of::<T>());
         self.families.insert(std::any::TypeId::of::<T>(), Box::new(family));
     }
