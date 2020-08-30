@@ -19,7 +19,8 @@ pub struct HP {
 group!(Position, HP);
 
 fn main() {
-    //let vec = Vec::<Comp>::new();
+    let vec = Vec::<u32>::new();
+    vec.into_iter();
     // Todo get rid of mut
     let manager = ecs::Manager::new();
 
@@ -134,6 +135,27 @@ fn main() {
 
     //manager.run_task("Nope");
     //std::thread::sleep(std::time::Duration::from_secs(3));
+
+    manager.register_task("Render", |comp_manager: ecs::ComponentView| {
+        match comp_manager.get_components_mut::<Position>() {
+            Some(mut position) => {
+                match comp_manager.get_components::<HP>() {
+                    Some(hps) => {
+                        for index in 0..position.get_group() {
+                            //Safe because they are grouped
+                            let pos = position.component_at_mut(index).unwrap();
+                            let hp = hps.component_at(index).unwrap();
+
+                            pos.x = pos.x + hp.hp;
+                        }
+                    },
+                    None => print!("Inner error"),
+                }
+            },
+            None => print!("Error!\n"),
+        }
+    });
+
     manager.run_task("Render");
     
     /*let now = std::time::Instant::now();

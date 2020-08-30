@@ -34,6 +34,18 @@ impl<T> SparseSet<T> {
         }
     }
 
+    pub fn component_at(&self, index: usize) -> Option<&T> {
+        self.comp_array.get(index)
+    }
+
+    pub fn component_at_mut(&mut self, index: usize) -> Option<&mut T> {
+        self.comp_array.get_mut(index)
+    }
+
+    pub fn entity_at(&self, index: usize) -> Option<&Entity> {
+        self.entity_array.get(index)
+    }
+
     pub fn contains(&self, entity: &Entity) -> bool {
         match self.sparse_array.get(entity) {
             Some(_) => true,
@@ -68,5 +80,9 @@ impl<T> SparseSet<T> {
             },
             None => print!("No entity with id {}", entity),
         }
+    }
+
+    pub fn get_group(&self) -> usize {
+        self.group
     }
 }
