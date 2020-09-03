@@ -76,7 +76,7 @@ impl<T> SparseSet<T> {
         if self.sparse_array.contains_key(entity) {
             //Should never panic
             let entity_array_index = *self.sparse_array.get(entity).unwrap();
-            if self.next_group < entity_array_index { // TODO last place in group does not need to swap
+            if self.next_group < entity_array_index {
                 let ungrouped = *self.entity_array.get(self.next_group).unwrap();
                 let temp = self.sparse_array.insert(*entity, self.next_group).unwrap();
                 self.sparse_array.insert(ungrouped, temp);
@@ -95,7 +95,7 @@ impl<T> SparseSet<T> {
         if self.sparse_array.contains_key(entity) {
             //Should never panic
             let entity_array_index = *self.sparse_array.get(entity).unwrap();
-            if entity_array_index < self.next_group - 1 { // TODO last place in group does not need to swap
+            if entity_array_index < self.next_group - 1 {
                 let last_grouped = *self.entity_array.get(self.next_group-1).unwrap();
                 let temp = self.sparse_array.insert(*entity, self.next_group-1).unwrap();
                 self.sparse_array.insert(last_grouped, temp);
@@ -114,14 +114,22 @@ impl<T> SparseSet<T> {
         self.next_group
     }
 
-    pub fn remove(&mut self, entity: Entity) {
-        match self.sparse_array.get(&entity) {
-            Some(index) => {
-                if *index < self.next_group {
-                    
-                }
-            },
-            None => print!("No entity with id {} to remove!", entity),
+    pub fn remove(&mut self, entity: &Entity) {
+        if self.sparse_array.contains_key(entity) {
+            let index = *self.sparse_array.get(&entity).unwrap();
+            if index < self.next_group {
+                //TODO ungroup by index for efficency
+                self.ungroup(&entity);
+            }
+            self.sparse_array.remove(entity);
+            self.comp_array.swap_remove(index);
+            self.entity_array.swap_remove(index);
+
+            //Updates sparse array
+            let swaped_entity = self.entity_array.get(index).unwrap();
+            self.sparse_array.insert(*swaped_entity, index);
+        } else {
+            print!("No entity with id {} to remove!", entity);
         }
     }
 }

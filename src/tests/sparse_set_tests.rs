@@ -1,6 +1,7 @@
 
 use crate::sparse_set::SparseSet;
 
+#[derive(Debug)]
 struct TestType { 
 	data: i8 
 }
@@ -235,24 +236,32 @@ fn sparse_set_double_ungroup() {
 	assert_eq!(set.get_group_size(), 1);
 }
 
-// #[test]
-// fn sparse_set_remove() {
-// 	let mut set = SparseSet::<TestType>::new();
-// 	set.add(0, TestType{data: 7});
-// 	set.add(15, TestType{data: 3});
-// 	set.add(3, TestType{data: 4});
-// 	set.add(9, TestType{data: 25});
-// 	set.add(5, TestType{data: 44});
+#[test]
+fn sparse_set_remove() {
+	let mut set = SparseSet::<TestType>::new();
+	set.add(0, TestType{data: 7});
+	set.add(15, TestType{data: 3});
+	set.add(3, TestType{data: 4});
+	set.add(9, TestType{data: 25});
+	set.add(5, TestType{data: 44});
 
-// 	set.remove(3);
+	set.remove(&3);
 
-// 	assert_eq!(set.component_at(0).unwrap().data, 7);
-// 	assert_eq!(set.component_at(1).unwrap().data, 3);
-// 	assert_eq!(set.component_at(2).unwrap().data, 25);
-// 	assert_eq!(set.component_at(3).unwrap().data, 44);
+	assert_eq!(set.len(), 4);
 
-// 	assert_eq!(*set.entity_at(0).unwrap(), 0);
-// 	assert_eq!(*set.entity_at(1).unwrap(), 15);
-// 	assert_eq!(*set.entity_at(2).unwrap(), 9);
-// 	assert_eq!(*set.entity_at(3).unwrap(), 5);
-// }
+	assert_eq!(set.component_at(0).unwrap().data, 7);
+	assert_eq!(set.component_at(1).unwrap().data, 3);
+	assert_eq!(set.component_at(2).unwrap().data, 44);
+	assert_eq!(set.component_at(3).unwrap().data, 25);
+
+	assert_eq!(*set.entity_at(0).unwrap(), 0);
+	assert_eq!(*set.entity_at(1).unwrap(), 15);
+	assert_eq!(*set.entity_at(2).unwrap(), 5);
+	assert_eq!(*set.entity_at(3).unwrap(), 9);
+	
+	assert_eq!(set.get(&9).unwrap().data, 25);
+	assert_eq!(set.get(&15).unwrap().data, 3);
+	//assert_eq!(set.get(&3), None::<&TestType>);
+	assert_eq!(set.get(&0).unwrap().data, 7);
+	assert_eq!(set.get(&5).unwrap().data, 44);
+}
