@@ -1,5 +1,5 @@
 [package]
-name = "game_one"
+name = "rust_ecs"
 version = "0.1.0"
 authors = ["Martin"]
 edition = "2018"
