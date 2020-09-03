@@ -6,7 +6,7 @@ pub struct SparseSet<T> {
     comp_array: Vec<T>,
     entity_array: Vec<Entity>,
     sparse_array: SparseMap,
-    group: usize,
+    next_group: usize,
 }
 
 impl<T> SparseSet<T> {
@@ -15,15 +15,22 @@ impl<T> SparseSet<T> {
             comp_array: Vec::<T>::new(),
             entity_array: Vec::<Entity>::new(),
             sparse_array: SparseMap::new(),
-            group: 0,
+            next_group: 0,
         }
     }
 
     pub fn add(&mut self, entity: Entity, value: T) {
         //TODO check for existing value at index
-        self.sparse_array.insert(entity, self.comp_array.len());
-        self.comp_array.push(value);
-        self.entity_array.push(entity);
+        match self.sparse_array.get(&entity) {
+            Some(index) => {
+                self.comp_array.insert(*index, value);
+            },
+            None => {
+                self.sparse_array.insert(entity, self.comp_array.len());
+                self.comp_array.push(value);
+                self.entity_array.push(entity);
+            },
+        }
     }
 
     pub fn get(&self, entity: &Entity) -> Option<&T> {
@@ -65,23 +72,56 @@ impl<T> SparseSet<T> {
         //TODO print sparse_array
     }
 
-    pub fn swap(&mut self, entity: &Entity) {
-        match self.sparse_array.get(entity) {
-            Some(_) => {
-                //Should never panic
-                let entity_array_index = *self.sparse_array.get(entity).unwrap();
-                let ungrouped = *self.entity_array.get(self.group).unwrap();
-                let temp = self.sparse_array.insert(*entity, self.group).unwrap();
+    pub fn group(&mut self, entity: &Entity) {
+        if self.sparse_array.contains_key(entity) {
+            //Should never panic
+            let entity_array_index = *self.sparse_array.get(entity).unwrap();
+            if self.next_group < entity_array_index { // TODO last place in group does not need to swap
+                let ungrouped = *self.entity_array.get(self.next_group).unwrap();
+                let temp = self.sparse_array.insert(*entity, self.next_group).unwrap();
                 self.sparse_array.insert(ungrouped, temp);
-                self.comp_array.swap(self.group, entity_array_index);
-                self.entity_array.swap(self.group, entity_array_index);
-                self.group += 1;
-            },
-            None => print!("No entity with id {}", entity),
+                self.comp_array.swap(self.next_group, entity_array_index);
+                self.entity_array.swap(self.next_group, entity_array_index);
+                self.next_group += 1;
+            } else if self.next_group == entity_array_index {
+                self.next_group += 1;
+            }
+        } else {
+            print!("No entity with id {}", entity);
+        }
+    }
+
+    pub fn ungroup(&mut self, entity: &Entity) {
+        if self.sparse_array.contains_key(entity) {
+            //Should never panic
+            let entity_array_index = *self.sparse_array.get(entity).unwrap();
+            if entity_array_index < self.next_group - 1 { // TODO last place in group does not need to swap
+                let last_grouped = *self.entity_array.get(self.next_group-1).unwrap();
+                let temp = self.sparse_array.insert(*entity, self.next_group-1).unwrap();
+                self.sparse_array.insert(last_grouped, temp);
+                self.comp_array.swap(self.next_group-1, entity_array_index);
+                self.entity_array.swap(self.next_group-1, entity_array_index);
+                self.next_group -= 1;
+            } else if entity_array_index == self.next_group - 1 {
+                self.next_group -= 1;   
+            }
+        } else {
+            print!("No entity with id {}", entity);
         }
     }
 
     pub fn get_group_size(&self) -> usize {
-        self.group
+        self.next_group
+    }
+
+    pub fn remove(&mut self, entity: Entity) {
+        match self.sparse_array.get(&entity) {
+            Some(index) => {
+                if *index < self.next_group {
+                    
+                }
+            },
+            None => print!("No entity with id {} to remove!", entity),
+        }
     }
 }

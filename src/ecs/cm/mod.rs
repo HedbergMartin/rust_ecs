@@ -80,12 +80,12 @@ macro_rules! group_raw {
                 // print!("Sorting hps\n");
                 //TODO not mut?
                 if $(cm.contains::<$queue>(entity))&&+ && $(cm.contains::<$done>(entity))&&+ {
-                    cm.get_components_mut::<$head>().unwrap().swap(entity);
+                    cm.get_components_mut::<$head>().unwrap().group(entity);
                     $(
-                    cm.get_components_mut::<$queue>().unwrap().swap(entity);
+                    cm.get_components_mut::<$queue>().unwrap().group(entity);
                     )+
                     $(
-                    cm.get_components_mut::<$done>().unwrap().swap(entity);
+                    cm.get_components_mut::<$done>().unwrap().group(entity);
                     )+
                 }
             }
@@ -100,9 +100,9 @@ macro_rules! group_raw {
                 // print!("Sorting hps\n");
                 //TODO not mut?
                 if $(cm.contains::<$done>(entity))&&+ {
-                    cm.get_components_mut::<$head>().unwrap().swap(entity);
+                    cm.get_components_mut::<$head>().unwrap().group(entity);
                     $(
-                    cm.get_components_mut::<$done>().unwrap().swap(entity);
+                    cm.get_components_mut::<$done>().unwrap().group(entity);
                     )+
                 }
             }
@@ -116,9 +116,9 @@ macro_rules! group_raw {
                 // print!("Sorting hps\n");
                 //TODO not mut?
                 if $(cm.contains::<$queue>(entity))&&+ {
-                    cm.get_components_mut::<$head>().unwrap().swap(entity);
+                    cm.get_components_mut::<$head>().unwrap().group(entity);
                     $(
-                    cm.get_components_mut::<$queue>().unwrap().swap(entity);
+                    cm.get_components_mut::<$queue>().unwrap().group(entity);
                     )+
                 }
             }
