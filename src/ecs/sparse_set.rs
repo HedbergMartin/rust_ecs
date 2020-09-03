@@ -81,7 +81,7 @@ impl<T> SparseSet<T> {
         }
     }
 
-    pub fn get_group(&self) -> usize {
+    pub fn get_group_size(&self) -> usize {
         self.group
     }
 }
