@@ -1,7 +1,6 @@
 
 use crate::sparse_set::SparseSet;
 
-#[derive(Debug)]
 struct TestType { 
 	data: i8 
 }

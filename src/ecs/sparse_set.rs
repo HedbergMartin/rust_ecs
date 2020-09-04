@@ -20,16 +20,13 @@ impl<T> SparseSet<T> {
     }
 
     pub fn add(&mut self, entity: Entity, value: T) {
+        
+        //std::mem::replace(self.comp_array.get_mut(*index).unwrap(), value);
         //TODO check for existing value at index
-        match self.sparse_array.get(&entity) {
-            Some(index) => {
-                self.comp_array.insert(*index, value);
-            },
-            None => {
-                self.sparse_array.insert(entity, self.comp_array.len());
-                self.comp_array.push(value);
-                self.entity_array.push(entity);
-            },
+        if let None = self.sparse_array.get(&entity) {
+            self.sparse_array.insert(entity, self.comp_array.len());
+            self.comp_array.push(value);
+            self.entity_array.push(entity);
         }
     }
 
