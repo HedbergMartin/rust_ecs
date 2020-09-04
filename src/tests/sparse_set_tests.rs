@@ -265,3 +265,30 @@ fn sparse_set_remove() {
 	assert_eq!(set.get(&0).unwrap().data, 7);
 	assert_eq!(set.get(&5).unwrap().data, 44);
 }
+
+#[test]
+fn sparse_set_remove_one() {
+	let mut set = SparseSet::<TestType>::new();
+	set.add(0, TestType{data: 7});
+
+	set.remove(&0);
+
+	assert_eq!(set.len(), 0);
+}
+
+#[test]
+fn sparse_set_remove_last() {
+	let mut set = SparseSet::<TestType>::new();
+	set.add(0, TestType{data: 7});
+	set.add(2, TestType{data: 8});
+
+	set.remove(&2);
+
+	assert_eq!(set.len(), 1);
+
+	assert_eq!(set.component_at(0).unwrap().data, 7);
+
+	assert_eq!(*set.entity_at(0).unwrap(), 0);
+	
+	assert_eq!(set.get(&0).unwrap().data, 7);
+}

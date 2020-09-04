@@ -72,6 +72,7 @@ impl<T> SparseSet<T> {
         //TODO print sparse_array
     }
 
+    // TODO Redo group and ungroup functions
     pub fn group(&mut self, entity: &Entity) {
         if self.sparse_array.contains_key(entity) {
             //Should never panic
@@ -125,9 +126,11 @@ impl<T> SparseSet<T> {
             self.comp_array.swap_remove(index);
             self.entity_array.swap_remove(index);
 
-            //Updates sparse array
-            let swaped_entity = self.entity_array.get(index).unwrap();
-            self.sparse_array.insert(*swaped_entity, index);
+            //Updates sparse array if a swap occured
+            if index < self.len() {
+                let swaped_entity = self.entity_array.get(index).unwrap();
+                self.sparse_array.insert(*swaped_entity, index);
+            }
         } else {
             print!("No entity with id {} to remove!", entity);
         }
