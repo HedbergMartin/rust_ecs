@@ -48,7 +48,7 @@ fn cm_add_grouped_both(b: &mut Bencher) {
 #[bench]
 fn cm_add_grouped_random(b: &mut Bencher) {
 	let mut m = ComponentManager::new();
-	for i in 0..10 {
+	for i in 0..11 {
 		if (i < 4) {
 			m.add_component(i, GroupedPos{x: 0, y: 0, z: 0,});
 		}

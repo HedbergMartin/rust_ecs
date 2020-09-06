@@ -13,15 +13,22 @@ impl<T> Family<T> {
 
 pub struct Container {
     families: std::collections::HashMap<std::any::TypeId, Box<dyn std::any::Any>>,
+    cleaners: Vec<Box<dyn FnMut(crate::ecs::Entity)>>,
 }
 
 impl Container {
     pub fn new() -> Self {
-        Container { families: std::collections::HashMap::new() }
+        Container {
+            families: std::collections::HashMap::new(),
+            cleaners: Vec::new(),
+        }
     }
 
     pub fn add_family<T: std::any::Any>(&mut self, family: Family<T>) {
         self.families.insert(std::any::TypeId::of::<T>(), Box::new(family));
+        // TODO Remove old?
+        // self.cleaners.push(Box::new(|entity: crate::ecs::Entity| {
+        // }));
     }
 
     pub fn get_family<T: std::any::Any>(& self) -> Option<& Family<T>> {

@@ -10,6 +10,8 @@ pub mod systems;
 #[macro_use]
 pub mod cm;
 
+mod entity_handler;
+
 pub type Entity = usize;
 
 use std::cell::Ref;
@@ -19,10 +21,9 @@ use std::cell::RefCell;
 use std::sync::RwLock;
 
 pub struct Manager {
-    entities: Vec<i32>,
+    entities: RefCell<entity_handler::EntityHandler>,
     schedule: RefCell<std::collections::HashMap<String, systems::System>>,
     comp_manager: RefCell<cm::ComponentManager>,
-    next_entity_id: RwLock<Entity>,
 }
 
 pub type ComponentView<'l> = Ref<'l, cm::ComponentManager>;
@@ -30,18 +31,19 @@ pub type ComponentView<'l> = Ref<'l, cm::ComponentManager>;
 impl Manager {
     pub fn new() -> Self {
         Manager {
-            entities: Vec::new(),
+            entities: RefCell::new(entity_handler::EntityHandler::new()),
             schedule: RefCell::new(std::collections::HashMap::new()),
             comp_manager: RefCell::new(cm::ComponentManager::new()),
-            next_entity_id: RwLock::new(0),
         }
     }
 
     pub fn add_entity(&self) -> Entity {
-        let e = *self.next_entity_id.read().unwrap();
-        *self.next_entity_id.write().unwrap() = e+1;
+        self.entities.borrow_mut().new_entity()
+    }
 
-        return e;
+	pub fn kill_entity(&self, entity: Entity) {
+        self.entities.borrow_mut().kill_entity(entity);
+        self.comp_manager.borrow().clean_components(entity);
     }
 
     pub fn add_component<T: Groupable >(&self, entity: Entity, component: T) {

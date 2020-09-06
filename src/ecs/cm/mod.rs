@@ -8,12 +8,16 @@ pub type View<'l, T> = std::cell::Ref<'l, sparse_set::SparseSet<T>>;
 pub type ViewMut<'l, T> = std::cell::RefMut<'l, sparse_set::SparseSet<T>>;
 
 pub struct ComponentManager {
-    family_container: family_manager::Container
+    family_container: family_manager::Container,
+	cleans: Vec<Box<dyn Fn(&ComponentManager, Entity)>>,
 }
 
 impl ComponentManager {
     pub fn new() -> Self {
-        ComponentManager { family_container: family_manager::Container::new() }
+        ComponentManager {
+            family_container: family_manager::Container::new(),
+			cleans: Vec::new(),
+        }
     }
 
     pub fn add_component<T: Groupable >(&mut self, entity: Entity, component: T) {
@@ -24,9 +28,18 @@ impl ComponentManager {
             },
             None => {
                 self.family_container.add_family::<T>(family_manager::Family::new());
+                self.cleans.push(Box::new(|comp_manager: &ComponentManager, entity: Entity| {
+                    comp_manager.get_components_mut::<T>().unwrap().remove(&entity);
+                }));
                 self.add_component::<T>(entity, component);
                 return;
             },
+        }
+    }
+
+    pub fn clean_components(&self, entity: Entity) {
+        for func in self.cleans.iter() {
+            func(&self, entity);
         }
     }
     

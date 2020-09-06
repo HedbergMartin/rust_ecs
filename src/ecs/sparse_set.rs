@@ -128,8 +128,6 @@ impl<T> SparseSet<T> {
                 let swaped_entity = self.entity_array.get(index).unwrap();
                 self.sparse_array.insert(*swaped_entity, index);
             }
-        } else {
-            print!("No entity with id {} to remove!", entity);
         }
     }
 }
