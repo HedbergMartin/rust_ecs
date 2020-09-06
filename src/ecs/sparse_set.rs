@@ -23,7 +23,7 @@ impl<T> SparseSet<T> {
         
         //std::mem::replace(self.comp_array.get_mut(*index).unwrap(), value);
         //TODO check for existing value at index
-        if let None = self.sparse_array.get(&entity) {
+        if !self.sparse_array.contains_key(&entity) {
             self.sparse_array.insert(entity, self.comp_array.len());
             self.comp_array.push(value);
             self.entity_array.push(entity);
