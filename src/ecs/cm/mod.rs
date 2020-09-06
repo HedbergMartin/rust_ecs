@@ -48,7 +48,7 @@ impl ComponentManager {
         }
     }
 
-    pub fn contains<T: Groupable>(&self, entity: &Entity) -> bool {
+    pub fn has_component<T: Groupable>(&self, entity: &Entity) -> bool {
         match self.get_components::<T>() {
             Some(c) => c.contains(entity),
             None => false,
@@ -59,7 +59,7 @@ impl ComponentManager {
 #[macro_export]
 macro_rules! group {
     ($head:ty) => {
-        impl ecs::Groupable for $head {
+        impl crate::ecs::Groupable for $head {
             fn sort(cm: &crate::ecs::cm::ComponentManager, entity: &crate::ecs::Entity) {
                 
             }
@@ -74,12 +74,12 @@ macro_rules! group {
 #[macro_export]
 macro_rules! group_raw {
     ($head:ty, $($queue:ty),+; $($done:ty),+) => {
-        impl ecs::Groupable for $head {
+        impl crate::ecs::Groupable for $head {
             fn sort(cm: &crate::ecs::cm::ComponentManager, entity: &crate::ecs::Entity) {
                 //TODO unwrap?
                 // print!("Sorting hps\n");
                 //TODO not mut?
-                if $(cm.contains::<$queue>(entity))&&+ && $(cm.contains::<$done>(entity))&&+ {
+                if $(cm.has_component::<$queue>(entity))&&+ && $(cm.contains::<$done>(entity))&&+ {
                     cm.get_components_mut::<$head>().unwrap().group(entity);
                     $(
                     cm.get_components_mut::<$queue>().unwrap().group(entity);
@@ -94,12 +94,12 @@ macro_rules! group_raw {
     };
 
     ($head:ty; $($done:ty),+) => {
-        impl ecs::Groupable for $head {
+        impl crate::ecs::Groupable for $head {
             fn sort(cm: &crate::ecs::cm::ComponentManager, entity: &crate::ecs::Entity) {
                 //TODO unwrap?
                 // print!("Sorting hps\n");
                 //TODO not mut?
-                if $(cm.contains::<$done>(entity))&&+ {
+                if $(cm.has_component::<$done>(entity))&&+ {
                     cm.get_components_mut::<$head>().unwrap().group(entity);
                     $(
                     cm.get_components_mut::<$done>().unwrap().group(entity);
@@ -110,12 +110,12 @@ macro_rules! group_raw {
     };
     
     ($head:ty, $($queue:ty),+; ) => {
-        impl ecs::Groupable for $head {
+        impl crate::ecs::Groupable for $head {
             fn sort(cm: &crate::ecs::cm::ComponentManager, entity: &crate::ecs::Entity) {
                 //TODO unwrap?
                 // print!("Sorting hps\n");
                 //TODO not mut?
-                if $(cm.contains::<$queue>(entity))&&+ {
+                if $(cm.has_component::<$queue>(entity))&&+ {
                     cm.get_components_mut::<$head>().unwrap().group(entity);
                     $(
                     cm.get_components_mut::<$queue>().unwrap().group(entity);

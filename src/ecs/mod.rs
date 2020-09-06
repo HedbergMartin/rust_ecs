@@ -7,6 +7,7 @@ pub mod sparse_set;
 #[macro_use]
 pub mod systems;
 
+#[macro_use]
 pub mod cm;
 
 pub type Entity = usize;
