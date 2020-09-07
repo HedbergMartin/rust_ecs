@@ -2,6 +2,7 @@
 extern crate test;
 use self::test::Bencher;
 use crate::sparse_set::SparseSet;
+use crate::Entity;
 
 const ITEM_AMOUNT: usize = 100000;
 
@@ -14,7 +15,7 @@ fn sparse_set_add_one(b: &mut Bencher) {
 	let mut set = SparseSet::<TestType>::new();
 
 	b.iter(|| {
-		set.add(0, TestType {data: 0});
+		set.add(Entity::new(0, 0), TestType {data: 0});
 	});
 }
 
@@ -32,10 +33,10 @@ fn sparse_set_add_one(b: &mut Bencher) {
 #[bench]
 fn sparse_set_remove_one(b: &mut Bencher) {
 	let mut set = SparseSet::<TestType>::new();
-	set.add(0, TestType {data: 0});
+	set.add(Entity::new(0, 0), TestType {data: 0});
 
 	b.iter(|| {
-		set.remove(&0);
+		set.remove(&Entity::new(0, 0));
 	});
 }
 
@@ -43,7 +44,7 @@ fn sparse_set_remove_one(b: &mut Bencher) {
 fn sparse_set_itarate_100k(b: &mut Bencher) {
 	let mut set = SparseSet::<TestType>::new();
 	for i in 0..ITEM_AMOUNT {
-		set.add(i, TestType {data: i});
+		set.add(Entity::new(i as u32, 0), TestType {data: i as usize});
 	}
 
 	b.iter(|| {
@@ -59,11 +60,11 @@ fn sparse_set_itarate_100k(b: &mut Bencher) {
 fn sparse_set_group_len30(b: &mut Bencher) {
 	let mut set = SparseSet::<TestType>::new();
 	for i in 0..30 {
-		set.add(i, TestType {data: i});
+		set.add(Entity::new(i, 0), TestType {data: i as usize});
 	}
 
 	b.iter(|| {
-		set.group(&25);
+		set.group(&Entity::new(25, 0));
 	});
 }
 
@@ -71,14 +72,14 @@ fn sparse_set_group_len30(b: &mut Bencher) {
 fn sparse_set_ungroup_len30(b: &mut Bencher) {
 	let mut set = SparseSet::<TestType>::new();
 	for i in 0..30 {
-		set.add(i, TestType {data: i});
+		set.add(Entity::new(i, 0), TestType {data: i as usize});
 	}
-	set.group(&25);
-	set.group(&15);
-	set.group(&11);
-	set.group(&2);
+	set.group(&Entity::new(25, 0));
+	set.group(&Entity::new(15, 0));
+	set.group(&Entity::new(11, 0));
+	set.group(&Entity::new(2, 0));
 
 	b.iter(|| {
-		set.ungroup(&15);
+		set.ungroup(&Entity::new(15, 0));
 	});
 }

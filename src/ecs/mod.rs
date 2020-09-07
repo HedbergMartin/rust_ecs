@@ -83,7 +83,7 @@ pub trait Groupable: 'static {
 }
 
 #[macro_export]
-macro_rules! entity {
+macro_rules! entity_with {
     ($m:expr, $($comp:expr),*) => {{
         let e = crate::ecs::Manager::add_entity($m);
         $(
