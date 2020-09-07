@@ -92,7 +92,7 @@ macro_rules! group_raw {
                 //TODO unwrap?
                 // print!("Sorting hps\n");
                 //TODO not mut?
-                if $(cm.has_component::<$queue>(entity))&&+ && $(cm.contains::<$done>(entity))&&+ {
+                if $(cm.has_component::<$queue>(entity))&&+ && $(cm.has_component::<$done>(entity))&&+ {
                     cm.get_components_mut::<$head>().unwrap().group(entity);
                     $(
                     cm.get_components_mut::<$queue>().unwrap().group(entity);
