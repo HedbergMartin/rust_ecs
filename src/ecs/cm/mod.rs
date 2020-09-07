@@ -79,55 +79,15 @@ macro_rules! group {
         }
     };
     ($head:ty, $($tail:ty),+) => {
-        group_raw!($head, $($tail),+;);
+        group_rec!($head, $($tail),+;);
     };
 }
 
-// Ugly af but works
 #[macro_export]
-macro_rules! group_raw {
-    ($head:ty, $($queue:ty),+; $($done:ty),+) => {
+macro_rules! group_imlp {
+    ($head:ty, $($queue:ty),+) => {
         impl crate::ecs::Groupable for $head {
             fn sort(cm: &crate::ecs::cm::ComponentManager, entity: &crate::ecs::Entity) {
-                //TODO unwrap?
-                // print!("Sorting hps\n");
-                //TODO not mut?
-                if $(cm.has_component::<$queue>(entity))&&+ && $(cm.has_component::<$done>(entity))&&+ {
-                    cm.get_components_mut::<$head>().unwrap().group(entity);
-                    $(
-                    cm.get_components_mut::<$queue>().unwrap().group(entity);
-                    )+
-                    $(
-                    cm.get_components_mut::<$done>().unwrap().group(entity);
-                    )+
-                }
-            }
-        }
-        group_raw!($($queue),+; $($done),+, $head);
-    };
-
-    ($head:ty; $($done:ty),+) => {
-        impl crate::ecs::Groupable for $head {
-            fn sort(cm: &crate::ecs::cm::ComponentManager, entity: &crate::ecs::Entity) {
-                //TODO unwrap?
-                // print!("Sorting hps\n");
-                //TODO not mut?
-                if $(cm.has_component::<$done>(entity))&&+ {
-                    cm.get_components_mut::<$head>().unwrap().group(entity);
-                    $(
-                    cm.get_components_mut::<$done>().unwrap().group(entity);
-                    )+
-                }
-            }
-        }
-    };
-    
-    ($head:ty, $($queue:ty),+; ) => {
-        impl crate::ecs::Groupable for $head {
-            fn sort(cm: &crate::ecs::cm::ComponentManager, entity: &crate::ecs::Entity) {
-                //TODO unwrap?
-                // print!("Sorting hps\n");
-                //TODO not mut?
                 if $(cm.has_component::<$queue>(entity))&&+ {
                     cm.get_components_mut::<$head>().unwrap().group(entity);
                     $(
@@ -136,7 +96,24 @@ macro_rules! group_raw {
                 }
             }
         }
-        group_raw!($($queue),+; $head);
+    };
+}
+
+// Ugly af but works
+#[macro_export]
+macro_rules! group_rec {
+    ($head:ty, $($queue:ty),+; $($done:ty),+) => {
+        group_imlp!($head, $($queue),+, $($done),+);
+        group_rec!($($queue),+; $($done),+, $head);
+    };
+
+    ($head:ty, $($queue:ty),+;) => {
+        group_imlp!($head, $($queue),+);
+        group_rec!($($queue),+; $head);
+    };
+
+    ($head:ty; $($done:ty),+) => {
+        group_imlp!($head, $($done),+);
     };
 }
 
