@@ -1,12 +1,57 @@
 
-use crate::ecs::Entity;
-
 const ENTITY_MASK: u32 = 4294950912;
 const VERSION_MASK: u32 = 16383;
 
+#[derive(Hash, Clone, Copy)]
+pub struct Entity {
+	id: u32,
+}
+
+impl Entity {
+	
+	pub fn new(index: u32, version: u32) -> Self {
+		Self {
+			id: index << 18 + version,
+		}
+	}
+
+	pub fn get_index(&self) -> u32 {
+		self.id >> 18
+	}
+
+	pub fn get_version(&self) -> u32 {
+		self.id & VERSION_MASK
+	}
+}
+
+impl std::ops::Deref for Entity {
+	type Target = u32;
+
+    fn deref(&self) -> &Self::Target {
+        &self.id
+    }
+}
+
+impl std::fmt::Debug for Entity {
+	fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("Entity")
+         .field("index", &self.get_index())
+         .field("version", &self.get_version())
+         .finish()
+    }
+}
+
+impl PartialEq for Entity {
+    fn eq(&self, other: &Self) -> bool {
+        self.id == other.id
+    }
+}
+
+impl Eq for Entity {}
+
 pub struct EntityHandler {
 	entities: Vec<Entity>,
-	head_id: usize,
+	head_index: u32,
 	killed: usize,
 }
 
@@ -14,28 +59,23 @@ impl EntityHandler {
 	pub fn new() -> Self {
 		Self {
 			entities: Vec::new(),
-			head_id: 0,
+			head_index: 0,
 			killed: 0,
 		}
 	}
 
 	pub fn new_entity(&mut self) -> Entity {
-		/* if (self.pending > 0) {
-			//Clean a pending entity and return it.
-			return 0;
-		} else  */ 
 		if self.killed > 0 {
-			let head_entity = *self.entities.get(self.head_id).unwrap();
-			let head_vers = EntityHandler::to_version(head_entity);
-			let new_ident = EntityHandler::to_ident(self.head_id, head_vers + 1);
+			let head_entity = *self.entities.get(self.head_index as usize).unwrap();
+			let new_ident = Entity::new(self.head_index, head_entity.get_version());
 
-			*self.entities.get_mut(self.head_id).unwrap() = new_ident;
-			self.head_id = EntityHandler::to_entityid(head_entity);
+			*self.entities.get_mut(self.head_index as usize).unwrap() = new_ident;
+			self.head_index = head_entity.get_index();
 			//Dear god this code...
 			return new_ident;
 		} else {
-			let id = self.entities.len();
-			let new_ident = EntityHandler::to_ident(id, 0);
+			let index = self.entities.len() as u32;
+			let new_ident = Entity::new(index, 0);
 			self.entities.push(new_ident);
 			return new_ident;
 		}
@@ -43,29 +83,19 @@ impl EntityHandler {
 
 	pub fn kill_entity(&mut self, entity: Entity) {
 		//TODO Benchmark if if-statement should be removed.
-		if self.killed != 0 {
-			//This line sucks, sorry
-			*self.entities.get_mut(EntityHandler::to_entityid(entity)).unwrap() = EntityHandler::to_ident(self.head_id, EntityHandler::to_version(entity));
-		}
+		//This line sucks, sorry
+		*self.entities.get_mut(entity.get_index() as usize).unwrap() = Entity::new(self.head_index, entity.get_version() + 1);
 			
-		self.head_id = EntityHandler::to_entityid(entity);
+		self.head_index = entity.get_index();
 		self.killed += 1;
 	}
 
-	fn to_ident(id: usize, version: usize) -> Entity {
-		id << 18 + version
-	}
-
-	fn to_entityid(entity: Entity) -> usize {
-		entity >> 18
-	}
-
-	fn to_version(entity: Entity) -> usize {
-		entity & VERSION_MASK as usize
-	}
-
-	pub fn print_entity(entity: Entity) {
-		print!("Entity {{ id {}, version: {} }}", EntityHandler::to_entityid(entity), EntityHandler::to_version(entity));
+	pub fn is_alive(&self, entity: Entity) -> bool {
+		if let Some(identity) = self.entities.get(entity.get_index() as usize) {
+			//Compares version, but inefficient to do to_version
+			return *identity == entity;
+		}
+		return false;
 	}
 }
 
@@ -78,8 +108,8 @@ mod tests {
 	fn new_entity() {
 		let mut handler = EntityHandler::new();
 		let entity = handler.new_entity();
-		assert_eq!(EntityHandler::to_entityid(entity), 0);
-		assert_eq!(EntityHandler::to_version(entity), 0);
+		assert_eq!(entity.get_index(), 0);
+		assert_eq!(entity.get_version(), 0);
 	}
 
 	#[test]
@@ -89,12 +119,12 @@ mod tests {
 			handler.new_entity();
 		}
 		let entity = handler.new_entity();
-		assert_eq!(EntityHandler::to_entityid(entity), 25);
-		assert_eq!(EntityHandler::to_version(entity), 0);
+		assert_eq!(entity.get_index(), 25);
+		assert_eq!(entity.get_version(), 0);
 	}
 
 	#[test]
-	fn kill() {
+	fn kill_head_check() {
 		let mut handler = EntityHandler::new();
 		handler.new_entity();
 		let e1 = handler.new_entity();
@@ -104,7 +134,28 @@ mod tests {
 		handler.kill_entity(e2);
 		handler.kill_entity(e1);
 		
-		assert_eq!(handler.head_id, 1);
+		assert_eq!(handler.head_index, 1);
 	}
 
+	#[test]
+	fn kill() {
+		let mut handler = EntityHandler::new();
+		handler.new_entity();
+		let e1 = handler.new_entity();
+		handler.kill_entity(e1);
+		
+		assert!(!handler.is_alive(e1));
+	}
+
+	
+
+	#[test]
+	fn respawn() {
+		let mut handler = EntityHandler::new();
+		handler.new_entity();
+		let e1 = handler.new_entity();
+		handler.kill_entity(e1);
+
+		assert_eq!(handler.head_index, 1);
+	}
 }

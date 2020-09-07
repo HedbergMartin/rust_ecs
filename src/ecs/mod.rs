@@ -12,7 +12,7 @@ pub mod cm;
 
 mod entity_handler;
 
-pub type Entity = usize;
+pub use entity_handler::Entity;
 
 use std::cell::Ref;
 use std::cell::RefMut;

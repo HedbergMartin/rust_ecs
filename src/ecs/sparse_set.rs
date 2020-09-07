@@ -63,7 +63,7 @@ impl<T> SparseSet<T> {
     pub fn print(&self) {
         print!("Entitys ");
         for i in 0..self.len() {
-            print!("{} ({}), ", self.entity_array.get(i).unwrap(), i);
+            print!("{:?} ({}), ", self.entity_array.get(i).unwrap(), i);
         }
         print!("\n");
         //TODO print sparse_array
@@ -85,7 +85,7 @@ impl<T> SparseSet<T> {
                 self.next_group += 1;
             }
         } else {
-            print!("No entity with id {}", entity);
+            print!("No entity with id {:?}", entity);
         }
     }
 
@@ -104,7 +104,7 @@ impl<T> SparseSet<T> {
                 self.next_group -= 1;   
             }
         } else {
-            print!("No entity with id {}", entity);
+            print!("No entity with id {:?}", entity);
         }
     }
 
