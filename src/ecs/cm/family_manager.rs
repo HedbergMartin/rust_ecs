@@ -13,14 +13,12 @@ impl<T> Family<T> {
 
 pub struct Container {
     families: std::collections::HashMap<std::any::TypeId, Box<dyn std::any::Any>>,
-    cleaners: Vec<Box<dyn FnMut(crate::ecs::Entity)>>,
 }
 
 impl Container {
     pub fn new() -> Self {
         Container {
             families: std::collections::HashMap::new(),
-            cleaners: Vec::new(),
         }
     }
 

@@ -5,14 +5,12 @@ use crate::ecs::ComponentView;
 //pub trait func_type = 'static + Fn(ComponentView);
 
 pub struct System {
-    name: String,
     func_ptr: Box<dyn Fn(ComponentView)>  
 }
 
 impl System {
-    pub fn new<F: 'static + Fn(ComponentView)>(name: &str, func: F) -> Self {
+    pub fn new<F: 'static + Fn(ComponentView)>(func: F) -> Self {
         Self {
-            name: String::from(name),
             func_ptr: Box::new(func),
         }
     }

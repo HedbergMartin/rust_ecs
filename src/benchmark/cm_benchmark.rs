@@ -5,8 +5,6 @@ use crate::Entity;
 
 use crate::cm::*;
 
-const ITEM_AMOUNT: usize = 100000;
-
 #[allow(dead_code)]
 struct GroupedPos {
 	x: i32,
@@ -49,10 +47,10 @@ fn cm_add_grouped_both(b: &mut Bencher) {
 fn cm_add_grouped_random(b: &mut Bencher) {
 	let mut m = ComponentManager::new();
 	for i in 0..11 {
-		if (i < 4) {
+		if i < 4 {
 			m.add_component(Entity::new(i, 0), GroupedPos{x: 0, y: 0, z: 0,});
 		}
-		if (i % 2 == 0) {
+		if i % 2 == 0 {
 			m.add_component(Entity::new(i, 0), GroupedVel{x: 0, y: 0, z: 0,});
 		}
 	}

@@ -69,11 +69,12 @@ impl ComponentManager {
     }
 }
 
+#[allow(unused_macros)]
 #[macro_export]
 macro_rules! group {
     ($head:ty) => {
         impl crate::ecs::Groupable for $head {
-            fn sort(cm: &crate::ecs::cm::ComponentManager, entity: &crate::ecs::Entity) {
+            fn sort(_: &crate::ecs::cm::ComponentManager, _: &crate::ecs::Entity) {
                 
             }
         }
@@ -83,7 +84,7 @@ macro_rules! group {
     };
 }
 
-#[macro_export]
+#[allow(unused_macros)]
 macro_rules! group_imlp {
     ($head:ty, $($queue:ty),+) => {
         impl crate::ecs::Groupable for $head {
@@ -99,8 +100,7 @@ macro_rules! group_imlp {
     };
 }
 
-// Ugly af but works
-#[macro_export]
+#[allow(unused_macros)]
 macro_rules! group_rec {
     ($head:ty, $($queue:ty),+; $($done:ty),+) => {
         group_imlp!($head, $($queue),+, $($done),+);

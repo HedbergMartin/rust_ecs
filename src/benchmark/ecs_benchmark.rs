@@ -3,8 +3,6 @@ extern crate test;
 use self::test::Bencher;
 use crate::ecs;
 
-const ITEM_AMOUNT: usize = 100000;
-
 #[allow(dead_code)]
 struct PosComp {
 	x: i32,
@@ -74,7 +72,7 @@ fn ecs_add_same_group(b: &mut Bencher) {
 #[bench]
 fn ecs_kill_one(b: &mut Bencher) {
 	let manager = ecs::Manager::new();
-	for i in 0..20 {
+	for _ in 0..20 {
 		let entity = manager.add_entity();
 		manager.add_component(entity, PosComp{x: 0, y: 0, z: 0,});
 		manager.add_component(entity, VelComp{x: 0, y: 0, z: 0,});

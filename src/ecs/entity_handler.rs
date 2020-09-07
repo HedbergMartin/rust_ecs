@@ -1,5 +1,4 @@
 
-const ENTITY_MASK: u32 = 4294950912;
 const VERSION_MASK: u32 = 16383;
 
 #[derive(Hash, Clone, Copy)]

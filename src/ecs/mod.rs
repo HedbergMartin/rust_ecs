@@ -18,10 +18,10 @@ use std::cell::Ref;
 use std::cell::RefMut;
 use std::cell::RefCell;
 
-use std::sync::RwLock;
+// use std::sync::RwLock;
 
 pub struct Manager {
-    entities: RefCell<entity_handler::EntityHandler>,
+    ent_handler: RefCell<entity_handler::EntityHandler>,
     schedule: RefCell<std::collections::HashMap<String, systems::System>>,
     comp_manager: RefCell<cm::ComponentManager>,
 }
@@ -31,19 +31,23 @@ pub type ComponentView<'l> = Ref<'l, cm::ComponentManager>;
 impl Manager {
     pub fn new() -> Self {
         Manager {
-            entities: RefCell::new(entity_handler::EntityHandler::new()),
+            ent_handler: RefCell::new(entity_handler::EntityHandler::new()),
             schedule: RefCell::new(std::collections::HashMap::new()),
             comp_manager: RefCell::new(cm::ComponentManager::new()),
         }
     }
 
     pub fn add_entity(&self) -> Entity {
-        self.entities.borrow_mut().new_entity()
+        self.ent_handler.borrow_mut().new_entity()
     }
 
 	pub fn kill_entity(&self, entity: Entity) {
-        self.entities.borrow_mut().kill_entity(entity);
+        self.ent_handler.borrow_mut().kill_entity(entity);
         self.comp_manager.borrow().clean_components(entity);
+    }
+
+    pub fn entity_alive(&self, entity: Entity) -> bool {
+        self.ent_handler.borrow().is_alive(entity)
     }
 
     pub fn add_component<T: Groupable >(&self, entity: Entity, component: T) {
@@ -59,7 +63,7 @@ impl Manager {
     }
 
     pub fn register_task<F: 'static + Fn(ComponentView)>(&self, name: &str, func: F) {
-        self.schedule.borrow_mut().insert(String::from(name), systems::System::new(name, func));
+        self.schedule.borrow_mut().insert(String::from(name), systems::System::new(func));
     }
 
     pub fn run_task(&self, name: &str) {
