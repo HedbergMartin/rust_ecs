@@ -28,4 +28,4 @@ cargo test
 rustup run nightly cargo bench --features unstable
 
 ## About
-Rust_ECS is currently developed solely by me as a hobby project in order to get more familiar with Rust and to be able to use it in my own projects down the line.
+Rust_ECS is currently developed solely by me as a hobby project in order to get more familiar with Rust. My goal is to be able to use it in my own projects down the line.
