@@ -1,4 +1,4 @@
-use crate::ecs::Entity;
+use crate::Entity;
 
 type SparseMap = std::collections::HashMap<Entity, usize>;
 

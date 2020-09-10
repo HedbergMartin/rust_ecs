@@ -87,9 +87,9 @@ impl Manager {
 #[macro_export]
 macro_rules! entity_with {
     ($m:expr, $($comp:expr),*) => {{
-        let e = crate::ecs::Manager::add_entity($m);
+        let e = crate::Manager::add_entity($m);
         $(
-            crate::ecs::Manager::add_component($m, e, $comp);
+            crate::Manager::add_component($m, e, $comp);
         )*
         e
     }};

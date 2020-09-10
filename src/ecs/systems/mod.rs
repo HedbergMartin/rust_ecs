@@ -1,5 +1,5 @@
 
-use crate::ecs::ComponentView;
+use crate::ComponentView;
 
 //Not stable yet
 //pub trait func_type = 'static + Fn(ComponentView);

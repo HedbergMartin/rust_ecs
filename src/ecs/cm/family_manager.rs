@@ -1,4 +1,4 @@
-use crate::ecs::sparse_set::*;
+use crate::sparse_set::*;
 use std::cell::RefCell;
 
 pub struct Family<T> {

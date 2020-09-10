@@ -1,7 +1,7 @@
 
 extern crate test;
 use self::test::Bencher;
-use crate::ecs;
+use crate::*;
 
 #[allow(dead_code)]
 struct PosComp {
@@ -49,7 +49,7 @@ group!(OtherComp, SomeOtherComp, HPComp);
 
 #[bench]
 fn ecs_add_diffrent_groups(b: &mut Bencher) {
-	let manager = ecs::Manager::new();
+	let manager = Manager::new();
 
 	b.iter(|| {
 		let entity = manager.add_entity();
@@ -60,7 +60,7 @@ fn ecs_add_diffrent_groups(b: &mut Bencher) {
 
 #[bench]
 fn ecs_add_same_group(b: &mut Bencher) {
-	let manager = ecs::Manager::new();
+	let manager = Manager::new();
 
 	b.iter(|| {
 		let entity = manager.add_entity();
@@ -71,7 +71,7 @@ fn ecs_add_same_group(b: &mut Bencher) {
 
 #[bench]
 fn ecs_kill_one(b: &mut Bencher) {
-	let manager = ecs::Manager::new();
+	let manager = Manager::new();
 	for _ in 0..20 {
 		let entity = manager.add_entity();
 		manager.add_component(entity, PosComp{x: 0, y: 0, z: 0,});
