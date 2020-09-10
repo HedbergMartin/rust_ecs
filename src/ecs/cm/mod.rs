@@ -75,7 +75,7 @@ impl ComponentManager {
 /// Used to register lone components.
 #[allow(unused_macros)]
 #[macro_export]
-macro_rules! register_compontents {
+macro_rules! register_components {
     ($($component:ty),*) => {
         $(
         impl crate::ecs::Component for $component {

@@ -24,9 +24,6 @@ impl Container {
 
     pub fn add_family<T: std::any::Any>(&mut self, family: Family<T>) {
         self.families.insert(std::any::TypeId::of::<T>(), Box::new(family));
-        // TODO Remove old?
-        // self.cleaners.push(Box::new(|entity: crate::ecs::Entity| {
-        // }));
     }
 
     pub fn get_family<T: std::any::Any>(& self) -> Option<& Family<T>> {
