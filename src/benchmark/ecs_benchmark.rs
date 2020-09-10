@@ -44,7 +44,7 @@ struct SomeOtherComp {
 }
 
 group!(PosComp, RenderComp);
-group!(VelComp);
+register_compontents!(VelComp);
 group!(OtherComp, SomeOtherComp, HPComp);
 
 #[bench]

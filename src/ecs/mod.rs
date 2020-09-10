@@ -10,6 +10,8 @@ pub mod systems;
 #[macro_use]
 pub mod cm;
 
+pub use cm::Component;
+
 mod entity_handler;
 
 pub use entity_handler::Entity;
@@ -50,7 +52,7 @@ impl Manager {
         self.ent_handler.borrow().is_alive(entity)
     }
 
-    pub fn add_component<T: Groupable >(&self, entity: Entity, component: T) {
+    pub fn add_component<T: Component >(&self, entity: Entity, component: T) {
         self.comp_manager.borrow_mut().add_component(entity, component);
     }
 
@@ -74,16 +76,12 @@ impl Manager {
         }
     }
 
-    pub fn print_components<T: Groupable>(&self) {
+    pub fn print_components<T: Component>(&self) {
         match self.get_comp_manager().get_components::<T>() {
             Some(comp) => comp.print(),
             None => print!("No comp of type {:?} found", std::any::type_name::<T>()),
         }
     }
-}
-
-pub trait Groupable: 'static {
-    fn sort(cm: &cm::ComponentManager, entity: &Entity);
 }
 
 #[macro_export]
