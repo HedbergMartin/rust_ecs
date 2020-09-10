@@ -6,7 +6,7 @@ Rust_ECS is an open-source Entity-Component-System(ECS) written in Rust. Its mai
 Rust_ECS is an sparse set entity compontent system inspired by ENTT.
 
 ## WARNING
-Rust_ecs is in a very early stage. When it's in a state ready to be used, I will remove this warning :)
+Rust_ECS is in a very early stage. When it's in a state ready to be used, I will remove this warning :)
 
 ## Currently implemented:
 (Exluding spawning, destroying and iterating of entities/components)
@@ -19,7 +19,20 @@ Rust_ecs is in a very early stage. When it's in a state ready to be used, I will
 ## How to use
 
 ### As library:
-Coming soon..
+
+Add this line under [dependencies] in your Cargo.toml to include Rust_ECS in your project.
+
+```
+rust_ecs = { git = "https://github.com/HedbergMartin/rust_ecs.git" }
+```
+
+Then add this to to your crate root file:
+
+```rust
+#[macro_use]
+extern crate rust_ecs;
+```
+
 
 ### Run tests:
 cargo test

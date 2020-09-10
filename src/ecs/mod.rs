@@ -56,7 +56,7 @@ impl Manager {
         self.comp_manager.borrow_mut().add_component(entity, component);
     }
 
-    fn get_comp_manager(&self) -> Ref<'_, cm::ComponentManager> {
+    pub fn get_comp_manager(&self) -> Ref<'_, cm::ComponentManager> {
         self.comp_manager.borrow()
     }
 

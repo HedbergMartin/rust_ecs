@@ -78,8 +78,8 @@ impl ComponentManager {
 macro_rules! register_components {
     ($($component:ty),*) => {
         $(
-        impl crate::Component for $component {
-            fn group(_: &crate::cm::ComponentManager, _: &crate::Entity) { }
+        impl $crate::Component for $component {
+            fn group(_: &$crate::cm::ComponentManager, _: &$crate::Entity) { }
         }
         )*
     };
@@ -107,8 +107,8 @@ macro_rules! group_partial {
 #[macro_export]
 macro_rules! group_imlp {
     ($head:ty, $($queue:ty),+) => {
-        impl crate::Component for $head {
-            fn group(cm: &crate::cm::ComponentManager, entity: &crate::Entity) {
+        impl $crate::Component for $head {
+            fn group(cm: &$crate::cm::ComponentManager, entity: &$crate::Entity) {
                 if $(cm.has_component::<$queue>(entity))&&+ {
                     cm.get_components_mut::<$head>().unwrap().group(entity);
                     $(
@@ -125,8 +125,8 @@ macro_rules! group_imlp {
 #[macro_export]
 macro_rules! group_partial_imlp {
     ($head:ty; $($queue:ty),+) => {
-        impl crate::Component for $head {
-            fn sort(cm: &crate::cm::ComponentManager, entity: &crate::Entity) {
+        impl $crate::Component for $head {
+            fn sort(cm: &$crate::cm::ComponentManager, entity: &$crate::Entity) {
                 if $(cm.has_component::<$queue>(entity))&&+ {
                     cm.get_components_mut::<$head>().unwrap().group(entity);
                 }
