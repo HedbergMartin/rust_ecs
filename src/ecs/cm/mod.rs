@@ -10,19 +10,41 @@ pub trait Component: 'static {
     fn group(cm: &ComponentManager, entity: &Entity);
 }
 
+///
+/// Sub manager to handle component part of the ecs.
+/// 
 pub struct ComponentManager {
     family_container: family_manager::Container,
 	cleans: Vec<Box<dyn Fn(&ComponentManager, Entity)>>,
 }
 
 impl ComponentManager {
-    pub fn new() -> Self {
+    pub(crate) fn new() -> Self {
         ComponentManager {
             family_container: family_manager::Container::new(),
 			cleans: Vec::new(),
         }
     }
 
+    ///
+    /// Adds a new component to an entity.
+    /// 
+    /// # Panics
+    /// 
+    /// Panics if any other thread adds or works with components currently.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// struct Comp {}
+    /// 
+    /// !register_components(Comp);
+    /// 
+    /// let manager = rust_ecs::Manager::new();
+    /// 
+    /// let entity = manager.add_entity();
+    /// manager.get_comp_manager_mut().add_component(entity, Comp {});
+    /// ```
     pub fn add_component<T: Component >(&mut self, entity: Entity, component: T) {
         match self.family_container.get_family_mut::<T>() {
             Some(family) => {
@@ -40,12 +62,34 @@ impl ComponentManager {
         }
     }
 
-    pub fn clean_components(&self, entity: Entity) {
+    pub(crate) fn clean_components(&self, entity: Entity) {
         for func in self.cleans.iter() {
             func(&self, entity);
         }
     }
-    
+
+    ///
+    /// Gets the sparse_set of a certain component.
+    /// 
+    /// # Panics
+    /// 
+    /// Panics if any other thread adds the same component or borrows the same component as mutable.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// struct Comp {}
+    /// 
+    /// !register_components(Comp);
+    /// 
+    /// let manager = rust_ecs::Manager::new();
+    /// 
+    /// let entity = manager.add_entity();
+    /// manager.add_component(entity, Comp {});
+    /// let comp_manager = manager.get_comp_manager();
+    /// 
+    /// comp_manager.get_component::<Comp>();
+    /// ```
     pub fn get_components<T: Component>(&self) -> Option<View<T>> {
         match self.family_container.get_family::<T>() {
             Some(family) =>  {
@@ -54,7 +98,29 @@ impl ComponentManager {
             None => None,
         }
     }
-    
+
+    ///
+    /// Gets the mutable sparse_set of a certain component.
+    /// 
+    /// # Panics
+    /// 
+    /// Panics if any other thread adds or borrows the same component.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// struct Comp {}
+    /// 
+    /// !register_components(Comp);
+    /// 
+    /// let manager = rust_ecs::Manager::new();
+    /// 
+    /// let entity = manager.add_entity();
+    /// manager.add_component(entity, Comp {});
+    /// let comp_manager = manager.get_comp_manager();
+    /// 
+    /// comp_manager.get_component_mut::<Comp>();
+    /// ```
     pub fn get_components_mut<T: Component>(&self) -> Option<ViewMut<T>> {
         match self.family_container.get_family::<T>() {
             Some(family) =>  {
@@ -64,6 +130,29 @@ impl ComponentManager {
         }
     }
 
+    ///
+    /// Checks if a entity has the given component
+    /// 
+    /// # Panics
+    /// 
+    /// Panics if any other thread adds the same component or borrows the same component as mutable.
+    /// Will be solved soon when Manager becomes threadsafe.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// struct Comp {}
+    /// 
+    /// !register_components(Comp);
+    /// 
+    /// let manager = rust_ecs::Manager::new();
+    /// 
+    /// let entity = manager.add_entity();
+    /// manager.add_component(entity, Comp {});
+    /// let comp_manager = manager.get_comp_manager();
+    /// 
+    /// assert!(comp_manager.has_component::<Comp>(entity));
+    /// ```
     pub fn has_component<T: Component>(&self, entity: &Entity) -> bool {
         match self.get_components::<T>() {
             Some(c) => c.contains(entity),
@@ -104,7 +193,6 @@ macro_rules! group_partial {
 }
 
 #[allow(unused_macros)]
-#[macro_export]
 macro_rules! group_imlp {
     ($head:ty, $($queue:ty),+) => {
         impl $crate::Component for $head {
@@ -122,7 +210,6 @@ macro_rules! group_imlp {
 
 
 #[allow(unused_macros)]
-#[macro_export]
 macro_rules! group_partial_imlp {
     ($head:ty; $($queue:ty),+) => {
         impl $crate::Component for $head {
