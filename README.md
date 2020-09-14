@@ -1,4 +1,5 @@
 # Rust_ECS
+[![license](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/HedbergMartin/rust_ecs/blob/master/LICENSE)
 
 ## Description
 Rust_ECS is an open-source Entity-Component-System(ECS) written in Rust. Its main goal is to be easy to use while still having high performance. 
