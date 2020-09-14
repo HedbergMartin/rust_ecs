@@ -53,8 +53,8 @@ fn ecs_add_diffrent_groups(b: &mut Bencher) {
 
 	b.iter(|| {
 		let entity = manager.add_entity();
-		manager.add_component(entity, PosComp{x: 0, y: 0, z: 0,});
-		manager.add_component(entity, VelComp{x: 0, y: 0, z: 0,});
+		manager.add_component(&entity, PosComp{x: 0, y: 0, z: 0,});
+		manager.add_component(&entity, VelComp{x: 0, y: 0, z: 0,});
 	});
 }
 
@@ -64,8 +64,8 @@ fn ecs_add_same_group(b: &mut Bencher) {
 
 	b.iter(|| {
 		let entity = manager.add_entity();
-		manager.add_component(entity, PosComp{x: 0, y: 0, z: 0,});
-		manager.add_component(entity, RenderComp{x: 0, y: 0, z: 0,});
+		manager.add_component(&entity, PosComp{x: 0, y: 0, z: 0,});
+		manager.add_component(&entity, RenderComp{x: 0, y: 0, z: 0,});
 	});
 }
 
@@ -74,14 +74,14 @@ fn ecs_kill_one(b: &mut Bencher) {
 	let manager = Manager::new();
 	for _ in 0..20 {
 		let entity = manager.add_entity();
-		manager.add_component(entity, PosComp{x: 0, y: 0, z: 0,});
-		manager.add_component(entity, VelComp{x: 0, y: 0, z: 0,});
+		manager.add_component(&entity, PosComp{x: 0, y: 0, z: 0,});
+		manager.add_component(&entity, VelComp{x: 0, y: 0, z: 0,});
 	}
 
 	
 	let entity = manager.add_entity();
-	manager.add_component(entity, PosComp{x: 0, y: 0, z: 0,});
-	manager.add_component(entity, VelComp{x: 0, y: 0, z: 0,});
+	manager.add_component(&entity, PosComp{x: 0, y: 0, z: 0,});
+	manager.add_component(&entity, VelComp{x: 0, y: 0, z: 0,});
 
 	b.iter(|| {
 		manager.kill_entity(entity);

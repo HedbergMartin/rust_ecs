@@ -1,8 +1,9 @@
 use crate::sparse_set::*;
 use std::cell::RefCell;
+use crate::Entity;
 
 pub struct Family<T> {
-    pub components: RefCell<SparseSet<T>>,
+    pub components: RefCell<SparseSet<Entity, T>>,
 }
 
 impl<T> Family<T> {

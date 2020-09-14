@@ -10,7 +10,7 @@ impl Entity {
 	
 	pub fn new(index: u32, version: u32) -> Self {
 		Self {
-			id: index << 18 + version,
+			id: (index << 18) + version,
 		}
 	}
 
@@ -20,6 +20,11 @@ impl Entity {
 
 	pub fn get_version(&self) -> u32 {
 		self.id & VERSION_MASK
+	}
+
+	#[allow(dead_code)]
+	fn new_ident(&mut self, index: u32, version: u32) {
+		self.id = (index << 18) + version;
 	}
 }
 
@@ -83,14 +88,20 @@ impl EntityHandler {
 	pub fn kill_entity(&mut self, entity: Entity) {
 		//TODO Benchmark if if-statement should be removed.
 		//This line sucks, sorry
-		*self.entities.get_mut(entity.get_index() as usize).unwrap() = Entity::new(self.head_index, entity.get_version() + 1);
+		if let Some(elem) = self.entities.get_mut(entity.get_index() as usize) {
+			*elem = Entity::new(self.head_index, entity.get_version() + 1);
+			//elem.new_ident(self.head_index, entity.get_version() + 12);
+			//let _ = std::mem::replace(elem, Entity::new(self.head_index, entity.get_version() + 1));
+		}
 			
 		self.head_index = entity.get_index();
 		self.killed += 1;
 	}
 
 	pub fn is_alive(&self, entity: Entity) -> bool {
+		print!("To kill {:?}\n", entity);
 		if let Some(identity) = self.entities.get(entity.get_index() as usize) {
+			print!("Ident {:?}\n", *identity);
 			//Compares version, but inefficient to do to_version
 			return *identity == entity;
 		}
@@ -139,7 +150,6 @@ mod tests {
 	#[test]
 	fn kill() {
 		let mut handler = EntityHandler::new();
-		handler.new_entity();
 		let e1 = handler.new_entity();
 		handler.kill_entity(e1);
 		
@@ -156,5 +166,12 @@ mod tests {
 		handler.kill_entity(e1);
 
 		assert_eq!(handler.head_index, 1);
+	}
+
+	#[test]
+	fn entity_ident_version() {
+		let e = Entity::new(0, 20);
+
+		assert_eq!(e.id, 20);
 	}
 }

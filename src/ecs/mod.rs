@@ -108,7 +108,7 @@ impl Manager {
     /// let entity = manager.add_entity();
     /// manager.kill_entity(entity);
     /// 
-    /// assert!(!manager.is_alive(entity));
+    /// assert!(!manager.entity_alive(entity));
     /// ```
     pub fn entity_alive(&self, entity: Entity) -> bool {
         self.ent_handler.borrow().is_alive(entity)
@@ -125,16 +125,17 @@ impl Manager {
     /// # Examples
     ///
     /// ```
+    /// use rust_ecs::*;
     /// struct Comp {}
     /// 
-    /// !register_components(Comp);
+    /// register_components!(Comp);
     /// 
-    /// let manager = rust_ecs::Manager::new();
+    /// let manager = Manager::new();
     /// 
     /// let entity = manager.add_entity();
-    /// manager.add_component(entity, Comp {});
+    /// manager.add_component(&entity, Comp {});
     /// ```
-    pub fn add_component<T: Component >(&self, entity: Entity, component: T) {
+    pub fn add_component<T: Component >(&self, entity: &Entity, component: T) {
         self.comp_manager.borrow_mut().add_component(entity, component);
     }
 

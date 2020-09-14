@@ -3,8 +3,8 @@ mod family_manager;
 use crate::sparse_set;
 use crate::Entity;
 
-pub type View<'l, T> = std::cell::Ref<'l, sparse_set::SparseSet<T>>;
-pub type ViewMut<'l, T> = std::cell::RefMut<'l, sparse_set::SparseSet<T>>;
+pub type View<'l, T> = std::cell::Ref<'l, sparse_set::SparseSet<Entity, T>>;
+pub type ViewMut<'l, T> = std::cell::RefMut<'l, sparse_set::SparseSet<Entity, T>>;
 
 pub trait Component: 'static {
     fn group(cm: &ComponentManager, entity: &Entity);
@@ -36,16 +36,17 @@ impl ComponentManager {
     /// # Examples
     ///
     /// ```
+    /// use rust_ecs::*;
     /// struct Comp {}
     /// 
-    /// !register_components(Comp);
+    /// register_components!(Comp);
     /// 
-    /// let manager = rust_ecs::Manager::new();
+    /// let manager = Manager::new();
     /// 
     /// let entity = manager.add_entity();
-    /// manager.get_comp_manager_mut().add_component(entity, Comp {});
+    /// manager.get_comp_manager_mut().add_component(&entity, Comp {});
     /// ```
-    pub fn add_component<T: Component >(&mut self, entity: Entity, component: T) {
+    pub fn add_component<T: Component >(&mut self, entity: &Entity, component: T) {
         match self.family_container.get_family_mut::<T>() {
             Some(family) => {
                 family.components.borrow_mut().add(entity, component);
@@ -78,17 +79,19 @@ impl ComponentManager {
     /// # Examples
     ///
     /// ```
+    /// use rust_ecs::*;
+    /// 
     /// struct Comp {}
     /// 
-    /// !register_components(Comp);
+    /// register_components!(Comp);
     /// 
-    /// let manager = rust_ecs::Manager::new();
+    /// let manager = Manager::new();
     /// 
     /// let entity = manager.add_entity();
-    /// manager.add_component(entity, Comp {});
+    /// manager.add_component(&entity, Comp {});
     /// let comp_manager = manager.get_comp_manager();
     /// 
-    /// comp_manager.get_component::<Comp>();
+    /// comp_manager.get_components::<Comp>();
     /// ```
     pub fn get_components<T: Component>(&self) -> Option<View<T>> {
         match self.family_container.get_family::<T>() {
@@ -109,17 +112,19 @@ impl ComponentManager {
     /// # Examples
     ///
     /// ```
+    /// use rust_ecs::*;
+    /// 
     /// struct Comp {}
     /// 
-    /// !register_components(Comp);
+    /// register_components!(Comp);
     /// 
     /// let manager = rust_ecs::Manager::new();
     /// 
     /// let entity = manager.add_entity();
-    /// manager.add_component(entity, Comp {});
+    /// manager.add_component(&entity, Comp {});
     /// let comp_manager = manager.get_comp_manager();
     /// 
-    /// comp_manager.get_component_mut::<Comp>();
+    /// comp_manager.get_components_mut::<Comp>();
     /// ```
     pub fn get_components_mut<T: Component>(&self) -> Option<ViewMut<T>> {
         match self.family_container.get_family::<T>() {
@@ -141,17 +146,18 @@ impl ComponentManager {
     /// # Examples
     ///
     /// ```
+    /// use rust_ecs::*;
     /// struct Comp {}
     /// 
-    /// !register_components(Comp);
+    /// register_components!(Comp);
     /// 
-    /// let manager = rust_ecs::Manager::new();
+    /// let manager = Manager::new();
     /// 
     /// let entity = manager.add_entity();
-    /// manager.add_component(entity, Comp {});
+    /// manager.add_component(&entity, Comp {});
     /// let comp_manager = manager.get_comp_manager();
     /// 
-    /// assert!(comp_manager.has_component::<Comp>(entity));
+    /// assert!(comp_manager.has_component::<Comp>(&entity));
     /// ```
     pub fn has_component<T: Component>(&self, entity: &Entity) -> bool {
         match self.get_components::<T>() {
