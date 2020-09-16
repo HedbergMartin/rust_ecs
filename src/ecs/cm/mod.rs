@@ -165,7 +165,6 @@ impl ComponentManager {
 }
 
 /// Used to register lone components.
-#[allow(unused_macros)]
 #[macro_export]
 macro_rules! register_components {
     ($($component:ty),*) => {
@@ -178,7 +177,6 @@ macro_rules! register_components {
 }
 
 /// Used to register components that are grouped together fully owned.
-#[allow(unused_macros)]
 #[macro_export]
 macro_rules! group {
     ($head:ty, $($tail:ty),+) => {
@@ -187,15 +185,14 @@ macro_rules! group {
 }
 
 /// Used to register a component that is grouped by other components.
-#[allow(unused_macros)]
 #[macro_export]
 macro_rules! group_partial {
-    ($head:ty; $($tail:ty),+) => {
-        group_partial_imlp!($head; $($tail),+;);
+    ($head:ty => $($tail:ty),+) => {
+        group_partial_imlp!($head, $($tail),+);
     };
 }
 
-#[allow(unused_macros)]
+#[macro_export]
 macro_rules! group_imlp {
     ($head:ty, $($queue:ty),+) => {
         impl $crate::Component for $head {
@@ -212,11 +209,11 @@ macro_rules! group_imlp {
 }
 
 
-#[allow(unused_macros)]
+#[macro_export]
 macro_rules! group_partial_imlp {
-    ($head:ty; $($queue:ty),+) => {
+    ($head:ty, $($queue:ty),+) => {
         impl $crate::Component for $head {
-            fn sort(cm: &$crate::ComponentManager, entity: &$crate::Entity) {
+            fn group(cm: &$crate::ComponentManager, entity: &$crate::Entity) {
                 if $(cm.has_component::<$queue>(entity))&&+ {
                     cm.get_components_mut::<$head>().unwrap().group(entity);
                 }
@@ -225,7 +222,7 @@ macro_rules! group_partial_imlp {
     };
 }
 
-#[allow(unused_macros)]
+#[macro_export]
 macro_rules! group_rec {
     ($head:ty, $($queue:ty),+; $($done:ty),+) => {
         group_imlp!($head, $($queue),+, $($done),+);

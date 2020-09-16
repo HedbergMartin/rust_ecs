@@ -15,7 +15,7 @@ use std::cell::Ref;
 use std::cell::RefMut;
 use std::cell::RefCell;
 
-pub type ComponentView<'l> = Ref<'l, ComponentManager>;
+pub(crate) type ComponentView<'l> = Ref<'l, ComponentManager>;
 
 // use std::sync::RwLock;
 
@@ -28,6 +28,43 @@ pub struct Manager {
     comp_manager: RefCell<ComponentManager>,
 }
 
+///
+/// Trait used to mark a structure as a component.
+/// DO NOT implement as is, use one of the predefined macros!
+/// 
+/// # Example
+/// 
+/// ## Register two components, as ungrouped components.
+/// ```
+/// use rust_ecs::*;
+/// 
+/// struct CompA {}
+/// struct CompB {}
+/// 
+/// register_components!(CompA, CompB);
+/// ```
+/// 
+/// ## Register two components as grouped.
+/// ```
+/// use rust_ecs::*;
+/// 
+/// struct CompA {}
+/// struct CompB {}
+/// 
+/// group!(CompA, CompB);
+/// ```
+/// 
+/// ## Register A to group after B.
+/// ```
+/// use rust_ecs::*;
+/// 
+/// struct CompA {}
+/// struct CompB {}
+/// 
+/// register_components!(CompB);
+/// group_partial!(CompA => CompB);
+/// ```
+/// 
 pub trait Component: 'static {
     fn group(cm: &ComponentManager, entity: &Entity);
 }
