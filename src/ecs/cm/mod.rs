@@ -188,13 +188,13 @@ macro_rules! group {
 #[macro_export]
 macro_rules! group_partial {
     ($head:ty => $($tail:ty),+) => {
-        group_partial_imlp!($head, $($tail),+);
+        group_imlp!(PARTIAL $head, $($tail),+);
     };
 }
 
 #[macro_export]
 macro_rules! group_imlp {
-    ($head:ty, $($queue:ty),+) => {
+    (FULL $head:ty, $($queue:ty),+) => {
         impl $crate::Component for $head {
             fn group(cm: &$crate::ComponentManager, entity: &$crate::Entity) {
                 if $(cm.has_component::<$queue>(entity))&&+ {
@@ -206,12 +206,8 @@ macro_rules! group_imlp {
             }
         }
     };
-}
 
-
-#[macro_export]
-macro_rules! group_partial_imlp {
-    ($head:ty, $($queue:ty),+) => {
+    (PARTIAL $head:ty, $($queue:ty),+) => {
         impl $crate::Component for $head {
             fn group(cm: &$crate::ComponentManager, entity: &$crate::Entity) {
                 if $(cm.has_component::<$queue>(entity))&&+ {
@@ -225,17 +221,17 @@ macro_rules! group_partial_imlp {
 #[macro_export]
 macro_rules! group_rec {
     ($head:ty, $($queue:ty),+; $($done:ty),+) => {
-        group_imlp!($head, $($queue),+, $($done),+);
+        group_imlp!(FULL $head, $($queue),+, $($done),+);
         group_rec!($($queue),+; $($done),+, $head);
     };
 
     ($head:ty, $($queue:ty),+;) => {
-        group_imlp!($head, $($queue),+);
+        group_imlp!(FULL $head, $($queue),+);
         group_rec!($($queue),+; $head);
     };
 
     ($head:ty; $($done:ty),+) => {
-        group_imlp!($head, $($done),+);
+        group_imlp!(FULL $head, $($done),+);
     };
 }
 
