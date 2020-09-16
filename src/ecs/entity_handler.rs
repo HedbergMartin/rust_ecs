@@ -8,23 +8,47 @@ pub struct Entity {
 
 impl Entity {
 	
-	pub fn new(index: u32, version: u32) -> Self {
+	pub(crate) fn new(index: u32, version: u32) -> Self {
 		Self {
 			id: (index << 18) + version,
 		}
 	}
 
+	///
+    /// Gets the index of the entity.
+    /// 
+    /// # Examples
+    ///
+    /// ```
+	/// 
+    /// let manager = rust_ecs::Manager::new();
+    /// 
+    /// let entity1 = manager.add_entity();
+    /// let entity2 = manager.add_entity();
+    /// 
+    /// assert_eq!(0, entity1.get_index());
+    /// assert_eq!(1, entity2.get_index());
+    /// ```
 	pub fn get_index(&self) -> u32 {
 		self.id >> 18
 	}
 
+	///
+    /// Gets the version of the entity.
+    /// 
+    /// # Examples
+    ///
+    /// ```
+    /// let manager = rust_ecs::Manager::new();
+    /// 
+    /// let entity1 = manager.add_entity();
+    /// let entity2 = manager.add_entity();
+    /// 
+    /// assert_eq!(0, entity1.get_version());
+    /// assert_eq!(0, entity2.get_version());
+    /// ```
 	pub fn get_version(&self) -> u32 {
 		self.id & VERSION_MASK
-	}
-
-	#[allow(dead_code)]
-	fn new_ident(&mut self, index: u32, version: u32) {
-		self.id = (index << 18) + version;
 	}
 }
 
@@ -53,6 +77,9 @@ impl PartialEq for Entity {
 
 impl Eq for Entity {}
 
+///
+/// Submodule for handling of entity creation and deletion.
+/// 
 pub struct EntityHandler {
 	entities: Vec<Entity>,
 	head_index: u32,
@@ -86,14 +113,10 @@ impl EntityHandler {
 	}
 
 	pub fn kill_entity(&mut self, entity: Entity) {
-		//TODO Benchmark if if-statement should be removed.
-		//This line sucks, sorry
 		if let Some(elem) = self.entities.get_mut(entity.get_index() as usize) {
 			*elem = Entity::new(self.head_index, entity.get_version() + 1);
 			self.head_index = entity.get_index();
 			self.killed += 1;
-			//elem.new_ident(self.head_index, entity.get_version() + 12);
-			//let _ = std::mem::replace(elem, Entity::new(self.head_index, entity.get_version() + 1));
 		}
 	}
 
@@ -180,20 +203,11 @@ mod benchmark {
 	use super::*;
 
 	#[bench]
-	fn new_entity(b: &mut Bencher) {
+	fn add_and_kill_entity(b: &mut Bencher) {
 		let mut handler = EntityHandler::new();
 
 		b.iter(|| {
-			//handler.new_entity();
-		});
-	}
-
-	#[bench]
-	fn kill_entity(b: &mut Bencher) {
-		let mut handler = EntityHandler::new();
-		let entity = handler.new_entity();
-
-		b.iter(|| {
+			let entity = handler.new_entity();
 			handler.kill_entity(entity);
 		});
 	}

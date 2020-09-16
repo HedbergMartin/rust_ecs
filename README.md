@@ -39,6 +39,7 @@ extern crate rust_ecs;
 cargo test
 
 ### Run benchmark:
+Warning, benchmarks are not recommended to run in current state as there design is flawed.
 rustup run nightly cargo bench --features unstable
 
 ## About

@@ -2,13 +2,10 @@ mod family_manager;
 
 use crate::sparse_set;
 use crate::Entity;
+use crate::Component;
 
 pub type View<'l, T> = std::cell::Ref<'l, sparse_set::SparseSet<Entity, T>>;
 pub type ViewMut<'l, T> = std::cell::RefMut<'l, sparse_set::SparseSet<Entity, T>>;
-
-pub trait Component: 'static {
-    fn group(cm: &ComponentManager, entity: &Entity);
-}
 
 ///
 /// Sub manager to handle component part of the ecs.
@@ -174,7 +171,7 @@ macro_rules! register_components {
     ($($component:ty),*) => {
         $(
         impl $crate::Component for $component {
-            fn group(_: &$crate::cm::ComponentManager, _: &$crate::Entity) { }
+            fn group(_: &$crate::ComponentManager, _: &$crate::Entity) { }
         }
         )*
     };
@@ -202,7 +199,7 @@ macro_rules! group_partial {
 macro_rules! group_imlp {
     ($head:ty, $($queue:ty),+) => {
         impl $crate::Component for $head {
-            fn group(cm: &$crate::cm::ComponentManager, entity: &$crate::Entity) {
+            fn group(cm: &$crate::ComponentManager, entity: &$crate::Entity) {
                 if $(cm.has_component::<$queue>(entity))&&+ {
                     cm.get_components_mut::<$head>().unwrap().group(entity);
                     $(
@@ -219,7 +216,7 @@ macro_rules! group_imlp {
 macro_rules! group_partial_imlp {
     ($head:ty; $($queue:ty),+) => {
         impl $crate::Component for $head {
-            fn sort(cm: &$crate::cm::ComponentManager, entity: &$crate::Entity) {
+            fn sort(cm: &$crate::ComponentManager, entity: &$crate::Entity) {
                 if $(cm.has_component::<$queue>(entity))&&+ {
                     cm.get_components_mut::<$head>().unwrap().group(entity);
                 }

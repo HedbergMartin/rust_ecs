@@ -1,24 +1,21 @@
-//mod sparse_set;
 
-
-//TODO all sub mods private?
 pub mod sparse_set;
 
 #[macro_use]
 pub mod systems;
 
 #[macro_use]
-pub mod cm;
-
-pub use cm::Component;
-
+mod cm;
 mod entity_handler;
 
+pub use cm::ComponentManager;
 pub use entity_handler::Entity;
 
 use std::cell::Ref;
 use std::cell::RefMut;
 use std::cell::RefCell;
+
+pub type ComponentView<'l> = Ref<'l, ComponentManager>;
 
 // use std::sync::RwLock;
 
@@ -28,10 +25,12 @@ use std::cell::RefCell;
 pub struct Manager {
     ent_handler: RefCell<entity_handler::EntityHandler>,
     schedule: RefCell<std::collections::HashMap<String, systems::System>>,
-    comp_manager: RefCell<cm::ComponentManager>,
+    comp_manager: RefCell<ComponentManager>,
 }
 
-pub type ComponentView<'l> = Ref<'l, cm::ComponentManager>;
+pub trait Component: 'static {
+    fn group(cm: &ComponentManager, entity: &Entity);
+}
 
 impl Manager {
     
@@ -47,7 +46,7 @@ impl Manager {
         Manager {
             ent_handler: RefCell::new(entity_handler::EntityHandler::new()),
             schedule: RefCell::new(std::collections::HashMap::new()),
-            comp_manager: RefCell::new(cm::ComponentManager::new()),
+            comp_manager: RefCell::new(ComponentManager::new()),
         }
     }
 
@@ -147,7 +146,7 @@ impl Manager {
     /// Panics if the value is currently mutably borrowed.
     /// Will be changed soon when Manager becomes threadsafe.
     ///
-    pub fn get_comp_manager(&self) -> Ref<'_, cm::ComponentManager> {
+    pub fn get_comp_manager(&self) -> Ref<'_, ComponentManager> {
         self.comp_manager.borrow()
     }
 
@@ -159,7 +158,7 @@ impl Manager {
     /// Panics if the value is currently borrowed.
     /// Will be changed soon when Manager becomes threadsafe.
     ///
-    pub fn get_comp_manager_mut(&self) -> RefMut<'_, cm::ComponentManager> {
+    pub fn get_comp_manager_mut(&self) -> RefMut<'_, ComponentManager> {
         self.comp_manager.borrow_mut()
     }
 
