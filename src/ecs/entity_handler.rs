@@ -90,18 +90,15 @@ impl EntityHandler {
 		//This line sucks, sorry
 		if let Some(elem) = self.entities.get_mut(entity.get_index() as usize) {
 			*elem = Entity::new(self.head_index, entity.get_version() + 1);
+			self.head_index = entity.get_index();
+			self.killed += 1;
 			//elem.new_ident(self.head_index, entity.get_version() + 12);
 			//let _ = std::mem::replace(elem, Entity::new(self.head_index, entity.get_version() + 1));
 		}
-			
-		self.head_index = entity.get_index();
-		self.killed += 1;
 	}
 
 	pub fn is_alive(&self, entity: Entity) -> bool {
-		print!("To kill {:?}\n", entity);
 		if let Some(identity) = self.entities.get(entity.get_index() as usize) {
-			print!("Ident {:?}\n", *identity);
 			//Compares version, but inefficient to do to_version
 			return *identity == entity;
 		}
@@ -173,5 +170,41 @@ mod tests {
 		let e = Entity::new(0, 20);
 
 		assert_eq!(e.id, 20);
+	}
+}
+
+#[cfg(all(feature = "unstable", test))]
+mod benchmark {
+	extern crate test;
+	use self::test::Bencher;
+	use super::*;
+
+	#[bench]
+	fn new_entity(b: &mut Bencher) {
+		let mut handler = EntityHandler::new();
+
+		b.iter(|| {
+			//handler.new_entity();
+		});
+	}
+
+	#[bench]
+	fn kill_entity(b: &mut Bencher) {
+		let mut handler = EntityHandler::new();
+		let entity = handler.new_entity();
+
+		b.iter(|| {
+			handler.kill_entity(entity);
+		});
+	}
+
+	#[bench]
+	fn is_alive(b: &mut Bencher) {
+		let mut handler = EntityHandler::new();
+		let entity = handler.new_entity();
+
+		b.iter(|| {
+			handler.is_alive(entity);
+		});
 	}
 }
