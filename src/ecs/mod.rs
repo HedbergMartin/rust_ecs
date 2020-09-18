@@ -209,10 +209,9 @@ impl Manager {
     }
 
     //Hmm 'a, A: 'a + views::Borrowable>
-    pub fn run_system<F: Fn(A), A: Borrowable>(&self, f: F) {
-        let cm = self.comp_manager.borrow();
-        let a = A::borrow(&cm);
-    }
+    // pub fn run_system<F: Fn(A), A: Borrowable<'_>>(&self, f: F) {
+    //     self.get_comp_manager().run_system(f);
+    // }
 
     pub fn run_task(&self, name: &str) {
         let n = String::from(name);
@@ -255,6 +254,10 @@ mod tests {
 	#[test]
 	fn run() {
         let manager = Manager::new();
-        manager.run_system(|a: View<Test>|{});
+        let e = manager.add_entity();
+        manager.add_component(&e, Test {});
+        manager.get_comp_manager().run_system(|a: View<Test>|{
+            assert_eq!(1, a.len());
+        });
     }
 }

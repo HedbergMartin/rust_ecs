@@ -100,6 +100,11 @@ impl ComponentManager {
         }
     }
 
+    pub fn run_system<'a, F: Fn(A), A: crate::Borrowable<'a>>(&'a self, f: F) {
+        let a = A::borrow(&self);
+        f(a);
+    }
+
     ///
     /// Gets the mutable sparse_set of a certain component.
     /// 
