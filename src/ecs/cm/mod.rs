@@ -1,11 +1,12 @@
 mod family_manager;
 
-use crate::sparse_set;
 use crate::Entity;
 use crate::Component;
+use crate::View;
+use crate::ViewMut;
 
-pub type View<'l, T> = std::cell::Ref<'l, sparse_set::SparseSet<Entity, T>>;
-pub type ViewMut<'l, T> = std::cell::RefMut<'l, sparse_set::SparseSet<Entity, T>>;
+// pub type View<'l, T> = std::cell::Ref<'l, sparse_set::SparseSet<Entity, T>>;
+// pub type ViewMut<'l, T> = std::cell::RefMut<'l, sparse_set::SparseSet<Entity, T>>;
 
 ///
 /// Sub manager to handle component part of the ecs.
@@ -93,7 +94,7 @@ impl ComponentManager {
     pub fn get_components<T: Component>(&self) -> Option<View<T>> {
         match self.family_container.get_family::<T>() {
             Some(family) =>  {
-                Some(family.components.borrow())
+                Some(View::new(family.components.borrow()))
             },
             None => None,
         }
@@ -126,7 +127,7 @@ impl ComponentManager {
     pub fn get_components_mut<T: Component>(&self) -> Option<ViewMut<T>> {
         match self.family_container.get_family::<T>() {
             Some(family) =>  {
-                Some(family.components.borrow_mut())
+                Some(ViewMut::new(family.components.borrow_mut()))
             },
             None => None,
         }
@@ -234,33 +235,3 @@ macro_rules! group_rec {
         group_imlp!(FULL $head, $($done),+);
     };
 }
-
-// pub struct View<'l, T: std::any::Any> {
-//     set_ref: std::cell::Ref<'l, sparse_set::SparseSet<T>>,
-// }
-
-// impl<T: std::any::Any> std::ops::Deref for View<'_, T> {
-//     type Target = sparse_set::SparseSet<T>;
-
-//     fn deref(&self) -> &Self::Target {
-//         &self.set_ref
-//     }
-// }
-
-// pub struct ViewMut<'l, T: std::any::Any> {
-//     set_ref: std::cell::RefMut<'l, sparse_set::SparseSet<T>>,
-// }
-
-// impl<'l, T: std::any::Any> std::ops::Deref for ViewMut<'l, T> {
-//     type Target = sparse_set::SparseSet<T>;
-
-//     fn deref(&self) -> &Self::Target {
-//         &self.set_ref
-//     }
-// }
-
-// impl<'l, T: std::any::Any> std::ops::DerefMut for ViewMut<'l, T> {
-//     fn deref_mut(&mut self) -> &mut Self::Target {
-//         &mut self.set_ref
-//     }
-// }

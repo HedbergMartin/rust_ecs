@@ -7,6 +7,11 @@ pub mod systems;
 #[macro_use]
 mod cm;
 mod entity_handler;
+mod views;
+
+pub use views::View;
+pub use views::ViewMut;
+pub(crate) use views::Borrowable;
 
 pub use cm::ComponentManager;
 pub use entity_handler::Entity;
@@ -203,6 +208,12 @@ impl Manager {
         self.schedule.borrow_mut().insert(String::from(name), systems::System::new(func));
     }
 
+    //Hmm 'a, A: 'a + views::Borrowable>
+    pub fn run_system<F: Fn(A), A: Borrowable>(&self, f: F) {
+        let cm = self.comp_manager.borrow();
+        let a = A::borrow(&cm);
+    }
+
     pub fn run_task(&self, name: &str) {
         let n = String::from(name);
         match self.schedule.borrow().get(&n) {
@@ -228,4 +239,22 @@ macro_rules! entity_with {
         )*
         e
     }};
+}
+
+//type View<'l, Comp> = Ref<'l, sparse_set::SparseSet<Entity, Comp>>;
+
+
+#[cfg(test)]
+mod tests {
+	use super::*;
+
+    struct Test {}
+
+    register_components!(Test);
+
+	#[test]
+	fn run() {
+        let manager = Manager::new();
+        manager.run_system(|a: View<Test>|{});
+    }
 }
