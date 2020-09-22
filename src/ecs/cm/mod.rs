@@ -100,11 +100,6 @@ impl ComponentManager {
         }
     }
 
-    pub fn run_system<'a, F: Fn(A), A: crate::Borrowable<'a>>(&'a self, f: F) {
-        let a = A::borrow(&self);
-        f(a);
-    }
-
     ///
     /// Gets the mutable sparse_set of a certain component.
     /// 
@@ -168,7 +163,36 @@ impl ComponentManager {
             None => false,
         }
     }
+        
+    pub fn borrow_many<'a, S: BorrowHandler<'a, A>, A>(&'a self, f: S) {
+        f.borrow_all(self);
+    }
 }
+
+pub trait BorrowHandler<'c, A> {
+    fn borrow_all(self, cm: &'c crate::ComponentManager);
+}
+
+macro_rules! borrow_many {
+    ($head:ident, $($tail:ident),+) => {
+        borrow_many!(IMPL => $head, $($tail),+);
+        borrow_many!($($tail),+);
+    };
+    
+    ($head:ident) => {
+        borrow_many!(IMPL => $head);
+    };
+
+    (IMPL => $($g:ident),+) => {
+        impl<'c, F: Fn($($g),+), $($g: crate::Borrowable<'c>),+> BorrowHandler<'c, ($($g),+)> for F {
+            fn borrow_all(self, cm: &'c crate::ComponentManager) {
+                (self)($($g::borrow(cm)),+);
+            }
+        }
+    };
+}
+
+borrow_many!(A,O,E,U,I,D,H,T,N,S);
 
 /// Used to register lone components.
 #[macro_export]

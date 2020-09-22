@@ -208,11 +208,6 @@ impl Manager {
         self.schedule.borrow_mut().insert(String::from(name), systems::System::new(func));
     }
 
-    //Hmm 'a, A: 'a + views::Borrowable>
-    // pub fn run_system<F: Fn(A), A: Borrowable<'_>>(&self, f: F) {
-    //     self.get_comp_manager().run_system(f);
-    // }
-
     pub fn run_task(&self, name: &str) {
         let n = String::from(name);
         match self.schedule.borrow().get(&n) {
@@ -256,7 +251,7 @@ mod tests {
         let manager = Manager::new();
         let e = manager.add_entity();
         manager.add_component(&e, Test {});
-        manager.get_comp_manager().run_system(|a: View<Test>|{
+        manager.get_comp_manager().borrow_many(|a: View<Test>, u: View<Test>|{
             assert_eq!(1, a.len());
         });
     }

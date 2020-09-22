@@ -4,7 +4,7 @@ use crate::Entity;
 
 type Set<T> = SparseSet<Entity, T>;
 
-pub trait Borrowable<'c> {
+pub trait Borrowable<'c> : Sized {
     fn borrow(cm: &'c crate::ComponentManager) -> Self;
 }
 
@@ -38,11 +38,11 @@ pub struct ViewMut<'l, T: 'static> {
     set_ref: std::cell::RefMut<'l, Set<T>>,
 }
 
-// impl<'l, T: 'static + crate::Component> Borrowable<'l> for ViewMut<'l, T> {
-//     fn borrow(cm: &'l crate::ComponentManager) -> Self {
-//         cm.get_components_mut::<T>().unwrap()
-//     }
-// }
+impl<'l, T: 'static + crate::Component> Borrowable<'l> for ViewMut<'l, T> {
+    fn borrow(cm: &'l crate::ComponentManager) -> Self {
+        cm.get_components_mut::<T>().unwrap()
+    }
+}
 
 impl<'l, T: 'static> ViewMut<'l, T> {
     pub fn new(set_ref: std::cell::RefMut<'l, Set<T>>) -> Self {

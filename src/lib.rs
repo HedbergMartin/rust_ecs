@@ -1,4 +1,6 @@
 
+// unused_parens lint bug, gives warning in borrow macro.
+#![allow(unused_parens)]
 #![cfg_attr(feature = "unstable", feature(test))]
 
 #[macro_use]
